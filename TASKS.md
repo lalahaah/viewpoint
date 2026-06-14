@@ -26,14 +26,14 @@
 
 ### STEP 2: 인증 시스템 (Auth — Step 1 직후 필수)
 
-- [ ] **T-11** `src/lib/auth.config.ts` 작성 (Edge-safe, Prisma import 금지)
-- [ ] **T-12** `src/lib/auth.ts` 작성 (Node.js, PrismaAdapter, Credentials 포함)
-- [ ] **T-13** `src/app/api/auth/[...nextauth]/route.ts` 작성
-- [ ] **T-14** `src/middleware.ts` 작성 (auth.config.ts import — auth.ts 금지)
-- [ ] **T-15** `src/store/authStore.ts` Zustand 작성
-- [ ] **T-16** `src/app/(auth)/login/page.tsx` 작성 (이메일 + 구글 로그인)
-- [ ] **T-17** `src/app/(auth)/signup/page.tsx` 작성 (역할 선택 UI 포함)
-- [ ] **T-18** `src/app/api/auth/register/route.ts` 작성 (비밀번호 해싱 + SPONSOR CreditBalance 생성)
+- [x] **T-11** `src/lib/auth.config.ts` 작성 (Edge-safe, Prisma import 금지)
+- [x] **T-12** `src/lib/auth.ts` 작성 (Node.js, PrismaAdapter, Credentials 포함)
+- [x] **T-13** `src/app/api/auth/[...nextauth]/route.ts` 작성
+- [x] **T-14** `src/middleware.ts` 작성 (auth.config.ts import — auth.ts 금지)
+- [x] **T-15** `src/store/authStore.ts` Zustand 작성
+- [x] **T-16** `src/app/(auth)/login/page.tsx` 작성 (이메일 + 구글 로그인)
+- [x] **T-17** `src/app/(auth)/signup/page.tsx` 작성 (역할 선택 UI 포함)
+- [x] **T-18** `src/app/api/auth/register/route.ts` 작성 (비밀번호 해싱 + SPONSOR CreditBalance 생성)
 
 ---
 
@@ -148,10 +148,10 @@
 
 | Phase | 전체 | 완료 | 진행률 |
 |---|---|---|---|
-| Phase 1 (MVP) | 68개 | 10개 | 15% |
+| Phase 1 (MVP) | 68개 | 18개 | 26% |
 | Phase 2 (운영) | 6개 | 0개 | 0% |
 | Phase 3 (성장) | 6개 | 0개 | 0% |
-| **합계** | **80개** | **10개** | **13%** |
+| **합계** | **80개** | **18개** | **23%** |
 
 ---
 
