@@ -5,7 +5,7 @@ import Link from "next/link"
 export default function Navigation() {
   return (
     <nav className="w-full bg-white border-b border-black rounded-none">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="container-main h-16 flex items-center justify-between">
         {/* Left: Brand logo */}
         <div className="flex-shrink-0">
           <Link href="/" className="font-black uppercase tracking-widest text-black text-xl rounded-none">

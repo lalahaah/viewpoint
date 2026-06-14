@@ -7,29 +7,34 @@ import { channels } from "@/lib/mockData"
 
 export const ShuffleHero = () => {
   return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-2 border-b border-black">
-      <div className="flex flex-col justify-center px-8 py-16 md:py-24 border-r border-black">
-        <p className="uppercase tracking-widest text-xs text-gray-500 mb-4 border border-black inline-block px-2 py-1 w-fit">
-          크리에이터 × 브랜드 협찬 마켓플레이스
-        </p>
-        <h1 className="text-5xl md:text-7xl font-black leading-none uppercase mb-6">
-          VIEW<br />POINT
-        </h1>
-        <p className="text-gray-600 text-lg mb-8 max-w-sm">
-          검증된 유튜브 채널에 직접 협찬 제안을 보내세요.
-          오픈 예정 채널을 가장 먼저 선점하는 얼리버드 스폰서십.
-        </p>
-        <div className="flex gap-0 border border-black w-fit">
-          <a href="/signup?role=sponsor" className="bg-black text-white px-6 py-3 uppercase tracking-widest text-sm hover:bg-white hover:text-black transition-colors border-r border-black rounded-none">
-            광고주로 시작
-          </a>
-          <a href="/signup?role=creator" className="px-6 py-3 uppercase tracking-widest text-sm hover:bg-black hover:text-white transition-colors rounded-none bg-white text-black">
-            채널 등록
-          </a>
+    <section className="w-full border-b border-black bg-white">
+      <div className="container-main grid grid-cols-1 md:grid-cols-2">
+        {/* Left Content */}
+        <div className="flex flex-col justify-center py-16 md:py-24 md:pr-8 border-b md:border-b-0 md:border-r border-black">
+          <p className="uppercase tracking-widest text-[10px] sm:text-xs text-gray-500 mb-4 border border-black inline-block px-2.5 py-1 w-fit font-black bg-white">
+            크리에이터 × 브랜드 협찬 마켓플레이스
+          </p>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-none uppercase mb-6 text-black">
+            VIEW<br />POINT
+          </h1>
+          <p className="text-gray-600 text-base sm:text-lg mb-8 max-w-sm leading-relaxed">
+            검증된 유튜브 채널에 직접 협찬 제안을 보내세요.
+            오픈 예정 채널을 가장 먼저 선점하는 얼리버드 스폰서십.
+          </p>
+          <div className="flex gap-0 border border-black w-fit rounded-none">
+            <a href="/signup?role=sponsor" className="bg-black text-white px-6 py-3 uppercase tracking-widest text-xs font-black hover:bg-white hover:text-black transition-colors border-r border-black rounded-none">
+              광고주로 시작
+            </a>
+            <a href="/signup?role=creator" className="px-6 py-3 uppercase tracking-widest text-xs font-black hover:bg-black hover:text-white transition-colors bg-white text-black rounded-none">
+              채널 등록
+            </a>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center justify-center p-8">
-        <ShuffleGrid />
+        
+        {/* Right Shuffle Grid (Hidden on Mobile) */}
+        <div className="hidden md:flex items-center justify-center p-8 md:pl-8">
+          <ShuffleGrid />
+        </div>
       </div>
     </section>
   )

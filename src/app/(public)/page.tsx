@@ -13,16 +13,22 @@ export default function HomePage() {
     <div className="w-full min-h-screen bg-white">
       <ShuffleHero />
 
-      <div id="channels" className="border-b border-black px-8 py-6 bg-white">
-        <h2 className="text-4xl font-black uppercase tracking-widest text-black">
-          CHANNELS
-        </h2>
-        <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">
-          현재 모집 중인 얼리버드 및 활성 채널 목록
-        </p>
+      <div id="channels" className="border-b border-black bg-white">
+        <div className="container-main py-6">
+          <h2 className="text-4xl font-black uppercase tracking-widest text-black">
+            CHANNELS
+          </h2>
+          <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">
+            현재 모집 중인 얼리버드 및 활성 채널 목록
+          </p>
+        </div>
       </div>
 
-      <ChannelGrid onChannelClick={setSelectedChannel} />
+      <div className="w-full bg-white py-8">
+        <div className="container-main">
+          <ChannelGrid onChannelClick={setSelectedChannel} />
+        </div>
+      </div>
 
       <ChannelModal
         channel={selectedChannel}

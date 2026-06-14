@@ -36,15 +36,15 @@ export default function ChannelGrid({ onChannelClick }: ChannelGridProps) {
   return (
     <div className="w-full bg-white">
       {/* Filter Bar */}
-      <div className="border-b border-black py-6 px-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          {/* Categories */}
-          <div className="flex flex-wrap gap-2">
+      <div className="border border-black py-6 px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6 overflow-hidden w-full lg:w-auto">
+          {/* Categories - Mobile horizontal scroll */}
+          <div className="flex overflow-x-auto flex-nowrap gap-2 pb-2 sm:pb-0 scrollbar-none -mx-6 px-6 sm:mx-0 sm:px-0">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat === "ALL" ? "" : cat)}
-                className={`px-4 py-2 text-xs uppercase tracking-widest font-black border border-black rounded-none transition-colors ${
+                className={`flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-black border border-black rounded-none transition-colors ${
                   (cat === "ALL" && category === "") || category === cat
                     ? "bg-black text-white"
                     : "bg-white text-black hover:bg-gray-50"
@@ -57,13 +57,13 @@ export default function ChannelGrid({ onChannelClick }: ChannelGridProps) {
 
           <div className="h-px sm:h-6 w-full sm:w-px bg-black hidden sm:block" />
 
-          {/* Types */}
-          <div className="flex gap-2">
+          {/* Types - Mobile horizontal scroll */}
+          <div className="flex overflow-x-auto flex-nowrap gap-2 pb-2 sm:pb-0 scrollbar-none -mx-6 px-6 sm:mx-0 sm:px-0">
             {TYPES.map((t) => (
               <button
                 key={t.value}
                 onClick={() => setChannelType(t.value as any)}
-                className={`px-4 py-2 text-xs uppercase tracking-widest font-black border border-black rounded-none transition-colors ${
+                className={`flex-shrink-0 px-4 py-2 text-xs uppercase tracking-widest font-black border border-black rounded-none transition-colors ${
                   channelType === t.value
                     ? "bg-black text-white"
                     : "bg-white text-black hover:bg-gray-50"
@@ -89,9 +89,9 @@ export default function ChannelGrid({ onChannelClick }: ChannelGridProps) {
 
       {/* Grid Content */}
       {filteredChannels.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-r border-b border-black">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredChannels.map((channel) => (
-            <div key={channel.id} className="border-l border-t border-black p-6">
+            <div key={channel.id} className="w-full">
               <ChannelCard
                 channel={channel}
                 onClick={() => onChannelClick(channel)}
@@ -100,7 +100,7 @@ export default function ChannelGrid({ onChannelClick }: ChannelGridProps) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-24 border-b border-black">
+        <div className="text-center py-24 border border-black">
           <p className="uppercase tracking-widest font-black text-sm text-gray-500">
             일치하는 채널이 없습니다.
           </p>
