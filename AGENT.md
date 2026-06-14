@@ -12,6 +12,12 @@
 5. **ASK before acting** if something seems missing or unclear. 임의로 판단하여 추가 작업하지 마라.
 6. **One step at a time. Nothing more. Nothing less.**
 7. **After completing a step, stop and report what was done.** 완료 후 즉시 멈추고 완료 보고만 하라.
+8. **Commit and push to GitHub after every step.** 각 Step 완료 후 반드시 아래 순서로 깃허브에 커밋 및 푸시하라:
+   - `.env`, `.env.local` 파일이 `.gitignore`에 포함되어 있는지 반드시 확인하라
+   - `git add .`
+   - `git commit -m "feat: Step N 완료 — [작업 내용 요약]"`
+   - `git push origin main`
+   - 커밋 메시지는 한국어로 작성하라. 예시: `"feat: Step 2 완료 — 인증 시스템 구축"`
 
 ---
 
