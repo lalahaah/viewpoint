@@ -39,12 +39,12 @@
 
 ### STEP 3: 메인 랜딩 페이지
 
-- [ ] **T-19** `src/components/landing/ShuffleHero.tsx` 작성 (AGENT.md 섹션 7.1 기준)
-- [ ] **T-20** `src/store/filterStore.ts` Zustand 작성 (category, channelType, searchQuery)
-- [ ] **T-21** `src/components/landing/ChannelCard.tsx` 작성 (ACTIVE/UPCOMING 분기)
-- [ ] **T-22** `src/components/landing/ChannelGrid.tsx` 작성 (필터바 + 그리드)
-- [ ] **T-23** `src/components/modals/ChannelModal.tsx` 작성 (Framer Motion 슬라이드인)
-- [ ] **T-24** `src/app/(public)/page.tsx` 작성 (ShuffleHero + ChannelGrid + ChannelModal)
+- [x] **T-19** `src/components/landing/ShuffleHero.tsx` 작성 (AGENT.md 섹션 7.1 기준)
+- [x] **T-20** `src/store/filterStore.ts` Zustand 작성 (category, channelType, searchQuery)
+- [x] **T-21** `src/components/landing/ChannelCard.tsx` 작성 (ACTIVE/UPCOMING 분기)
+- [x] **T-22** `src/components/landing/ChannelGrid.tsx` 작성 (필터바 + 그리드)
+- [x] **T-23** `src/components/modals/ChannelModal.tsx` 작성 (Framer Motion 슬라이드인)
+- [x] **T-24** `src/app/(public)/page.tsx` 작성 (ShuffleHero + ChannelGrid + ChannelModal)
 
 ---
 
@@ -148,10 +148,10 @@
 
 | Phase | 전체 | 완료 | 진행률 |
 |---|---|---|---|
-| Phase 1 (MVP) | 68개 | 18개 | 26% |
+| Phase 1 (MVP) | 68개 | 24개 | 35% |
 | Phase 2 (운영) | 6개 | 0개 | 0% |
 | Phase 3 (성장) | 6개 | 0개 | 0% |
-| **합계** | **80개** | **18개** | **23%** |
+| **합계** | **80개** | **24개** | **30%** |
 
 ---
 
