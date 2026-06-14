@@ -1,0 +1,486 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary)}
+.wf{width:100%;border:1.5px solid var(--color-text-primary)}
+.screen{display:none}.screen.active{display:block}
+.nav{display:flex;align-items:stretch;border-bottom:1.5px solid var(--color-text-primary);height:48px}
+.nav-logo{padding:0 16px;font-size:13px;font-weight:500;letter-spacing:4px;text-transform:uppercase;display:flex;align-items:center;border-right:1.5px solid var(--color-text-primary)}
+.nav-links{display:flex;flex:1;align-items:center}
+.nav-link{padding:0 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;height:100%;display:flex;align-items:center;border-right:1px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.nav-btns{display:flex;margin-left:auto}
+.nav-btn{padding:0 14px;font-size:10px;letter-spacing:2px;text-transform:uppercase;height:100%;display:flex;align-items:center;border-left:1.5px solid var(--color-text-primary);cursor:pointer}
+.nav-btn.primary{background:var(--color-text-primary);color:var(--color-background-primary)}
+.hero{display:grid;grid-template-columns:1fr 1fr;border-bottom:1.5px solid var(--color-text-primary)}
+.hero-left{padding:40px 32px;border-right:1.5px solid var(--color-text-primary)}
+.hero-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;border:1px solid var(--color-text-primary);display:inline-block;padding:4px 8px;margin-bottom:16px;color:var(--color-text-secondary)}
+.hero-h1{font-size:52px;font-weight:500;line-height:1;letter-spacing:-1px;text-transform:uppercase;margin-bottom:16px}
+.hero-sub{font-size:13px;color:var(--color-text-secondary);line-height:1.6;max-width:280px;margin-bottom:28px}
+.hero-cta{display:flex;border:1.5px solid var(--color-text-primary)}
+.hero-cta-btn{padding:10px 18px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer}
+.hero-cta-btn.primary{background:var(--color-text-primary);color:var(--color-background-primary);border-right:1.5px solid var(--color-text-primary)}
+.hero-right{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:0;padding:0}
+.hero-img{border:0.5px solid var(--color-text-primary);background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;aspect-ratio:1;font-size:9px;color:var(--color-text-tertiary)}
+.section-header{display:flex;align-items:center;padding:12px 24px;border-bottom:1.5px solid var(--color-text-primary)}
+.section-title{font-size:11px;letter-spacing:4px;text-transform:uppercase;font-weight:500;flex:1}
+.filter-bar{display:flex;align-items:stretch;border-bottom:1.5px solid var(--color-text-primary);overflow-x:auto}
+.filter-group{display:flex;align-items:stretch;border-right:1.5px solid var(--color-text-primary);padding:0 8px;gap:4px;align-items:center}
+.filter-pill{padding:4px 10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--color-text-primary);cursor:pointer;background:transparent;color:var(--color-text-primary);white-space:nowrap}
+.filter-pill.active{background:var(--color-text-primary);color:var(--color-background-primary)}
+.search-input{border:none;border-left:1.5px solid var(--color-text-primary);padding:0 12px;font-size:11px;flex:1;background:transparent;color:var(--color-text-primary);outline:none;min-width:120px}
+.channel-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.channel-card{border-right:1.5px solid var(--color-text-primary);border-bottom:1.5px solid var(--color-text-primary);cursor:pointer}
+.channel-card:nth-child(3n){border-right:none}
+.card-thumb{aspect-ratio:16/9;background:var(--color-background-secondary);border-bottom:1px solid var(--color-text-primary);position:relative;display:flex;align-items:center;justify-content:center}
+.card-upcoming-badge{position:absolute;top:8px;left:8px;background:var(--color-text-primary);color:var(--color-background-primary);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 7px;border-radius:99px}
+.card-body{padding:12px}
+.card-cat{font-size:8px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--color-text-primary);display:inline-block;padding:2px 6px;border-radius:99px;margin-bottom:6px;color:var(--color-text-secondary)}
+.card-name{font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.card-stat{font-size:10px;color:var(--color-text-secondary);margin-bottom:8px}
+.card-price-row{display:flex;justify-content:space-between;border-top:0.5px solid var(--color-border-tertiary);padding-top:6px}
+.card-price-label{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-tertiary)}
+.card-price-val{font-size:11px;font-weight:500}
+.progress-bar{height:2px;background:var(--color-border-tertiary);margin:6px 0}
+.progress-fill{height:100%;background:var(--color-text-primary)}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;justify-content:flex-end;z-index:10}
+.modal-panel{width:420px;background:var(--color-background-primary);border-left:1.5px solid var(--color-text-primary);overflow-y:auto;height:100%}
+.modal-header{display:flex;align-items:center;padding:16px;border-bottom:1.5px solid var(--color-text-primary)}
+.modal-title{font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:2px;flex:1}
+.modal-close{border:1px solid var(--color-text-primary);padding:4px;display:flex;cursor:pointer}
+.modal-thumbs{display:flex;gap:0;border-bottom:1.5px solid var(--color-text-primary);overflow-x:auto}
+.modal-thumb{width:100px;height:60px;background:var(--color-background-secondary);border-right:1px solid var(--color-text-primary);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--color-text-tertiary)}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1.5px solid var(--color-text-primary)}
+.modal-stat{padding:12px;border-right:1px solid var(--color-text-primary);text-align:center}
+.modal-stat:last-child{border-right:none}
+.modal-stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:4px}
+.modal-stat-val{font-size:18px;font-weight:500}
+.modal-section{padding:12px 16px;border-bottom:1.5px solid var(--color-text-primary)}
+.modal-section-title{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px}
+.ad-table{width:100%;border-collapse:collapse;font-size:11px}
+.ad-table th{background:var(--color-text-primary);color:var(--color-background-primary);padding:6px 8px;text-align:left;font-size:8px;letter-spacing:2px;text-transform:uppercase;font-weight:400}
+.ad-table td{padding:6px 8px;border-bottom:1px solid var(--color-border-tertiary)}
+.modal-cta{padding:12px 16px}
+.cta-btn{width:100%;padding:14px;background:var(--color-text-primary);color:var(--color-background-primary);font-size:10px;letter-spacing:3px;text-transform:uppercase;border:1.5px solid var(--color-text-primary);cursor:pointer;font-weight:400}
+.dash-layout{display:grid;grid-template-columns:200px 1fr;min-height:400px}
+.sidebar{border-right:1.5px solid var(--color-text-primary)}
+.sidebar-header{padding:12px 16px;border-bottom:1.5px solid var(--color-text-primary);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary)}
+.sidebar-link{display:block;padding:12px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--color-border-tertiary);cursor:pointer;border-left:3px solid transparent}
+.sidebar-link.active{border-left:3px solid var(--color-text-primary);font-weight:500}
+.dash-main{padding:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--color-text-primary);margin-bottom:20px}
+.stat-cell{padding:16px;border-right:1px solid var(--color-text-primary)}
+.stat-cell:last-child{border-right:none}
+.stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:500}
+.dash-table{width:100%;border-collapse:collapse;border:1.5px solid var(--color-text-primary)}
+.dash-table th{background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 12px;text-align:left;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:400}
+.dash-table td{padding:8px 12px;border-bottom:1px solid var(--color-border-tertiary);font-size:11px}
+.status-badge{font-size:8px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--color-text-primary);padding:2px 6px;border-radius:99px;white-space:nowrap}
+.action-btn{font-size:9px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--color-text-primary);padding:3px 8px;cursor:pointer;background:transparent;margin-right:4px}
+.action-btn.primary{background:var(--color-text-primary);color:var(--color-background-primary)}
+.credit-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1.5px solid var(--color-text-primary);margin-bottom:20px}
+.credit-card{padding:20px;border-right:1px solid var(--color-text-primary);text-align:center}
+.credit-card:last-child{border-right:none}
+.credit-tier{font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;color:var(--color-text-secondary)}
+.credit-amt{font-size:24px;font-weight:500;margin-bottom:4px}
+.credit-price{font-size:12px;color:var(--color-text-secondary);margin-bottom:12px}
+.best-badge{font-size:7px;letter-spacing:1px;text-transform:uppercase;background:var(--color-text-primary);color:var(--color-background-primary);padding:2px 6px;border-radius:99px;display:inline-block;margin-bottom:6px}
+.tab-bar{display:flex;border-bottom:1.5px solid var(--color-text-primary);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;border-right:1px solid var(--color-text-primary);cursor:pointer;background:transparent;color:var(--color-text-secondary)}
+.tab.active{background:var(--color-text-primary);color:var(--color-background-primary)}
+.nav-tabs{display:flex;border-bottom:1.5px solid var(--color-text-primary);padding:0 8px;gap:4px;overflow-x:auto}
+.nav-tab{padding:10px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);border-bottom:2px solid transparent;white-space:nowrap}
+.nav-tab.active{color:var(--color-text-primary);border-bottom:2px solid var(--color-text-primary);font-weight:500}
+.page-title{padding:16px 0;border-bottom:1.5px solid var(--color-text-primary);margin-bottom:20px}
+.page-title h2{font-size:11px;letter-spacing:4px;text-transform:uppercase;font-weight:500}
+</style>
+
+<h2 class="sr-only">ViewPoint 서비스 와이어프레임 — 랜딩, 채널 모달, 크리에이터 대시보드, 광고주 대시보드, 어드민 패널 5개 화면</h2>
+
+<div style="padding:1rem 0">
+<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+  <button class="filter-pill active" onclick="show('landing')">① 랜딩 페이지</button>
+  <button class="filter-pill" onclick="show('modal')">② 채널 상세 모달</button>
+  <button class="filter-pill" onclick="show('creator')">③ 크리에이터 대시보드</button>
+  <button class="filter-pill" onclick="show('sponsor')">④ 광고주 대시보드</button>
+  <button class="filter-pill" onclick="show('admin')">⑤ 어드민 패널</button>
+</div>
+
+<div class="wf">
+
+<!-- SCREEN 1: LANDING -->
+<div class="screen active" id="s-landing">
+  <div class="nav">
+    <div class="nav-logo">VIEWPOINT</div>
+    <div class="nav-links">
+      <div class="nav-link">홈</div>
+      <div class="nav-link">채널 탐색</div>
+      <div class="nav-link">크리에이터 가이드</div>
+      <div class="nav-link">광고주 가이드</div>
+    </div>
+    <div class="nav-btns">
+      <div class="nav-btn">로그인</div>
+      <div class="nav-btn primary">시작하기</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">크리에이터 × 브랜드 협찬 마켓플레이스</div>
+      <div class="hero-h1">VIEW<br>POINT</div>
+      <div class="hero-sub">검증된 유튜브 채널에 직접 협찬 제안을 보내세요. 오픈 예정 채널을 가장 먼저 선점하는 얼리버드 스폰서십.</div>
+      <div class="hero-cta">
+        <div class="hero-cta-btn primary">광고주로 시작</div>
+        <div class="hero-cta-btn">채널 등록</div>
+      </div>
+    </div>
+    <div class="hero-right" style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr)">
+      <div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div>
+      <div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div>
+      <div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div>
+      <div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div><div class="hero-img">img</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">CHANNELS</div>
+    <div style="font-size:10px;color:var(--color-text-tertiary);letter-spacing:2px">총 48개</div>
+  </div>
+
+  <div class="filter-bar" style="padding:8px 12px;gap:8px">
+    <div class="filter-group" style="border-right:none;gap:4px">
+      <button class="filter-pill active">ALL</button>
+      <button class="filter-pill">뷰티</button>
+      <button class="filter-pill">테크</button>
+      <button class="filter-pill">게임</button>
+      <button class="filter-pill">라이프</button>
+      <button class="filter-pill">푸드</button>
+    </div>
+    <div style="border-left:1.5px solid var(--color-text-primary);margin:0 4px"></div>
+    <div class="filter-group" style="border-right:none;gap:0;padding:0">
+      <button class="filter-pill active" style="border-right:none">ALL</button>
+      <button class="filter-pill" style="border-right:none">운영중</button>
+      <button class="filter-pill">오픈예정</button>
+    </div>
+    <input class="search-input" placeholder="채널명, 카테고리 검색..." style="border-left:1.5px solid var(--color-text-primary);border-right:none;border-top:none;border-bottom:none;padding:0 12px;flex:1;font-size:11px;background:transparent;outline:none">
+  </div>
+
+  <div class="channel-grid">
+    <!-- Card 1: ACTIVE -->
+    <div class="channel-card">
+      <div class="card-thumb"><span style="font-size:9px;color:var(--color-text-tertiary)">썸네일</span></div>
+      <div class="card-body">
+        <div class="card-cat">뷰티</div>
+        <div class="card-name">GLAM KOREA</div>
+        <div class="card-stat">구독자 32.1만  ·  평균 조회 8.4만</div>
+        <div class="card-price-row">
+          <div><div class="card-price-label">통합 광고</div><div class="card-price-val">₩600,000</div></div>
+          <div><div class="card-price-label">쇼츠</div><div class="card-price-val">₩150,000</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 2: ACTIVE -->
+    <div class="channel-card">
+      <div class="card-thumb"><span style="font-size:9px;color:var(--color-text-tertiary)">썸네일</span></div>
+      <div class="card-body">
+        <div class="card-cat">테크</div>
+        <div class="card-name">TECH INSIDER KR</div>
+        <div class="card-stat">구독자 18.5만  ·  평균 조회 5.2만</div>
+        <div class="card-price-row">
+          <div><div class="card-price-label">통합 광고</div><div class="card-price-val">₩400,000</div></div>
+          <div><div class="card-price-label">쇼츠</div><div class="card-price-val">₩80,000</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 3: UPCOMING -->
+    <div class="channel-card">
+      <div class="card-thumb">
+        <div class="card-upcoming-badge">UPCOMING</div>
+        <span style="font-size:9px;color:var(--color-text-tertiary)">썸네일</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cat">라이프</div>
+        <div class="card-name">DAILY SEOUL VLOG</div>
+        <div style="font-size:9px;color:var(--color-text-tertiary);margin-bottom:4px">2025.03.01 오픈 예정</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--color-text-tertiary);margin-bottom:6px"><span>₩600,000 / ₩1,000,000</span><span style="color:var(--color-text-primary);font-weight:500">D-14</span></div>
+        <div class="card-price-row">
+          <div><div class="card-price-label">얼리버드</div><div class="card-price-val">₩300,000</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 4 -->
+    <div class="channel-card">
+      <div class="card-thumb"><span style="font-size:9px;color:var(--color-text-tertiary)">썸네일</span></div>
+      <div class="card-body">
+        <div class="card-cat">게임</div>
+        <div class="card-name">GG SQUAD</div>
+        <div class="card-stat">구독자 55.0만  ·  평균 조회 22만</div>
+        <div class="card-price-row">
+          <div><div class="card-price-label">통합 광고</div><div class="card-price-val">₩1,200,000</div></div>
+          <div><div class="card-price-label">쇼츠</div><div class="card-price-val">₩300,000</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 5 -->
+    <div class="channel-card">
+      <div class="card-thumb"><span style="font-size:9px;color:var(--color-text-tertiary)">썸네일</span></div>
+      <div class="card-body">
+        <div class="card-cat">푸드</div>
+        <div class="card-name">MUKBANG STATION</div>
+        <div class="card-stat">구독자 9.8만  ·  평균 조회 3.1만</div>
+        <div class="card-price-row">
+          <div><div class="card-price-label">통합 광고</div><div class="card-price-val">₩200,000</div></div>
+          <div><div class="card-price-label">쇼츠</div><div class="card-price-val">₩50,000</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Card 6: UPCOMING -->
+    <div class="channel-card">
+      <div class="card-thumb">
+        <div class="card-upcoming-badge">UPCOMING</div>
+        <span style="font-size:9px;color:var(--color-text-tertiary)">썸네일</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cat">여행</div>
+        <div class="card-name">NOMAD KOREA</div>
+        <div style="font-size:9px;color:var(--color-text-tertiary);margin-bottom:4px">2025.04.15 오픈 예정</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--color-text-tertiary);margin-bottom:6px"><span>₩300,000 / ₩1,000,000</span><span style="color:var(--color-text-primary);font-weight:500">D-45</span></div>
+        <div class="card-price-row">
+          <div><div class="card-price-label">얼리버드</div><div class="card-price-val">₩250,000</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: CHANNEL MODAL -->
+<div class="screen" id="s-modal">
+  <div class="nav">
+    <div class="nav-logo">VIEWPOINT</div>
+    <div class="nav-links"><div class="nav-link">채널 탐색</div></div>
+    <div class="nav-btns"><div class="nav-btn primary">시작하기</div></div>
+  </div>
+  <div style="position:relative;min-height:520px">
+    <!-- dimmed bg -->
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.08)">
+      <div class="channel-grid" style="opacity:.3;pointer-events:none">
+        <div class="channel-card"><div class="card-thumb"></div><div class="card-body"><div class="card-name">GLAM KOREA</div></div></div>
+        <div class="channel-card"><div class="card-thumb"></div><div class="card-body"><div class="card-name">TECH INSIDER</div></div></div>
+        <div class="channel-card"><div class="card-thumb"></div><div class="card-body"><div class="card-name">DAILY VLOG</div></div></div>
+      </div>
+    </div>
+    <!-- Modal Panel -->
+    <div style="position:absolute;right:0;top:0;bottom:0;width:420px;background:var(--color-background-primary);border-left:1.5px solid var(--color-text-primary);overflow-y:auto">
+      <div class="modal-header">
+        <div class="modal-title">GLAM KOREA</div>
+        <div class="modal-close"><i class="ti ti-x" style="font-size:16px" aria-hidden="true"></i></div>
+      </div>
+      <div class="modal-thumbs">
+        <div class="modal-thumb">img 1</div>
+        <div class="modal-thumb">img 2</div>
+        <div class="modal-thumb">img 3</div>
+        <div class="modal-thumb">img 4</div>
+      </div>
+      <div class="modal-stats">
+        <div class="modal-stat"><div class="modal-stat-label">구독자</div><div class="modal-stat-val">32.1만</div></div>
+        <div class="modal-stat"><div class="modal-stat-label">평균 조회</div><div class="modal-stat-val">8.4만</div></div>
+        <div class="modal-stat"><div class="modal-stat-label">업로드</div><div class="modal-stat-val">주 2회</div></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">채널 소개</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.7">뷰티·메이크업 전문 채널. 구독자 32만 뷰티 유튜버의 일상과 리뷰 콘텐츠를 제공합니다. 20-30대 여성 중심의 충성도 높은 구독자층.</div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">광고 단가</div>
+        <table class="ad-table">
+          <tr><th>광고 유형</th><th>단가</th><th>설명</th></tr>
+          <tr><td>통합 광고</td><td style="font-weight:500">₩600,000</td><td style="color:var(--color-text-secondary)">영상 내 브랜드 노출</td></tr>
+          <tr><td>쇼츠</td><td style="font-weight:500">₩150,000</td><td style="color:var(--color-text-secondary)">Shorts 전용 광고</td></tr>
+        </table>
+      </div>
+      <div class="modal-section">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="font-size:9px;border:1px solid var(--color-text-primary);padding:2px 8px;border-radius:99px">#뷰티</span>
+          <span style="font-size:9px;border:1px solid var(--color-text-primary);padding:2px 8px;border-radius:99px">#메이크업</span>
+          <span style="font-size:9px;border:1px solid var(--color-text-primary);padding:2px 8px;border-radius:99px">#스킨케어</span>
+          <span style="font-size:9px;border:1px solid var(--color-text-primary);padding:2px 8px;border-radius:99px">#20대여성</span>
+        </div>
+      </div>
+      <div class="modal-cta">
+        <button class="cta-btn">제안서 보내기 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: CREATOR DASHBOARD -->
+<div class="screen" id="s-creator">
+  <div class="nav">
+    <div class="nav-logo">VIEWPOINT</div>
+    <div style="flex:1;display:flex;align-items:center;padding:0 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-text-tertiary)">크리에이터 대시보드</div>
+    <div class="nav-btns"><div class="nav-btn" style="font-size:10px;letter-spacing:1px">김뷰티 ▾</div></div>
+  </div>
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-header">CREATOR</div>
+      <div class="sidebar-link active">홈</div>
+      <div class="sidebar-link">내 채널</div>
+      <div class="sidebar-link">받은 제안서</div>
+      <div class="sidebar-link">수익 / 정산</div>
+    </div>
+    <div class="dash-main">
+      <div class="page-title"><h2>OVERVIEW</h2></div>
+      <div class="stats-grid">
+        <div class="stat-cell"><div class="stat-label">총 채널 수</div><div class="stat-val">2</div></div>
+        <div class="stat-cell"><div class="stat-label">총 제안 수신</div><div class="stat-val">14</div></div>
+        <div class="stat-cell"><div class="stat-label">이번달 수익</div><div class="stat-val" style="font-size:16px">₩1.8M</div></div>
+        <div class="stat-cell"><div class="stat-label">채널 총 조회</div><div class="stat-val" style="font-size:16px">245K</div></div>
+      </div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px">최근 제안서</div>
+      <table class="dash-table">
+        <tr><th>광고주</th><th>채널</th><th>유형</th><th>금액</th><th>상태</th><th>액션</th></tr>
+        <tr>
+          <td>아모레퍼시픽</td><td>GLAM KOREA</td><td style="font-size:10px">통합광고</td><td style="font-weight:500">₩600K</td>
+          <td><span class="status-badge">발송</span></td>
+          <td><button class="action-btn primary">수락</button><button class="action-btn">거절</button></td>
+        </tr>
+        <tr>
+          <td>샤오미</td><td>TECH INSIDER</td><td style="font-size:10px">쇼츠</td><td style="font-weight:500">₩80K</td>
+          <td><span class="status-badge">열람</span></td>
+          <td><button class="action-btn primary">수락</button><button class="action-btn">거절</button></td>
+        </tr>
+        <tr>
+          <td>올리브영</td><td>GLAM KOREA</td><td style="font-size:10px">통합광고</td><td style="font-weight:500">₩600K</td>
+          <td><span class="status-badge">완료</span></td>
+          <td style="color:var(--color-text-tertiary);font-size:10px">–</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: SPONSOR DASHBOARD -->
+<div class="screen" id="s-sponsor">
+  <div class="nav">
+    <div class="nav-logo">VIEWPOINT</div>
+    <div style="flex:1;display:flex;align-items:center;padding:0 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-text-tertiary)">광고주 대시보드</div>
+    <div class="nav-btns"><div class="nav-btn" style="font-size:10px;letter-spacing:1px">아모레퍼시픽 ▾</div></div>
+  </div>
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-header">SPONSOR</div>
+      <div class="sidebar-link">홈</div>
+      <div class="sidebar-link">보낸 제안서</div>
+      <div class="sidebar-link active">크레딧 / 결제</div>
+      <div class="sidebar-link">얼리버드 내역</div>
+    </div>
+    <div class="dash-main">
+      <div class="page-title"><h2>크레딧 / 결제</h2></div>
+      <div style="border:1.5px solid var(--color-text-primary);padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:6px">잔여 크레딧</div>
+          <div style="font-size:36px;font-weight:500">2</div>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);border-left:1px solid var(--color-border-tertiary);padding-left:16px;line-height:1.7">1크레딧 = 제안서 1건 발송<br>잔여 크레딧이 부족하면 추가 구매 필요</div>
+      </div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px">크레딧 패키지</div>
+      <div class="credit-cards">
+        <div class="credit-card">
+          <div class="credit-tier">STARTER</div>
+          <div class="credit-amt">5 크레딧</div>
+          <div class="credit-price">₩49,000</div>
+          <button class="action-btn" style="width:100%;padding:8px">구매하기</button>
+        </div>
+        <div class="credit-card" style="background:var(--color-background-secondary)">
+          <div class="best-badge">BEST VALUE</div>
+          <div class="credit-tier">GROWTH</div>
+          <div class="credit-amt">20 크레딧</div>
+          <div class="credit-price">₩149,000</div>
+          <button class="action-btn primary" style="width:100%;padding:8px">구매하기</button>
+        </div>
+        <div class="credit-card">
+          <div class="credit-tier">PRO</div>
+          <div class="credit-amt">50 크레딧</div>
+          <div class="credit-price">₩299,000</div>
+          <button class="action-btn" style="width:100%;padding:8px">구매하기</button>
+        </div>
+      </div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px">결제 내역</div>
+      <table class="dash-table">
+        <tr><th>날짜</th><th>구매 내역</th><th>금액</th><th>상태</th></tr>
+        <tr><td style="color:var(--color-text-secondary);font-size:10px">2025.01.10</td><td>GROWTH 20크레딧</td><td style="font-weight:500">₩149,000</td><td><span class="status-badge">완료</span></td></tr>
+        <tr><td style="color:var(--color-text-secondary);font-size:10px">2024.12.05</td><td>STARTER 5크레딧</td><td style="font-weight:500">₩49,000</td><td><span class="status-badge">완료</span></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: ADMIN PANEL -->
+<div class="screen" id="s-admin">
+  <div class="nav">
+    <div class="nav-logo">VIEWPOINT</div>
+    <div style="flex:1;display:flex;align-items:center;padding:0 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--color-text-tertiary)">ADMIN</div>
+    <div class="nav-btns"><div class="nav-btn" style="font-size:10px">ADMIN ▾</div></div>
+  </div>
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-header">VIEWPOINT ADMIN</div>
+      <div class="sidebar-link">대시보드</div>
+      <div class="sidebar-link active">채널 심사</div>
+      <div class="sidebar-link">회원 관리</div>
+      <div class="sidebar-link">제안서 현황</div>
+      <div class="sidebar-link">정산 관리</div>
+    </div>
+    <div class="dash-main">
+      <div class="page-title"><h2>채널 심사</h2></div>
+      <div class="tab-bar">
+        <button class="tab active">PENDING <span style="font-size:9px;background:var(--color-background-primary);color:var(--color-text-primary);border-radius:99px;padding:1px 5px;margin-left:4px;border:1px solid var(--color-background-primary)">3</span></button>
+        <button class="tab">APPROVED</button>
+        <button class="tab">REJECTED</button>
+      </div>
+      <table class="dash-table">
+        <tr><th>채널명</th><th>크리에이터</th><th>카테고리</th><th>유형</th><th>구독자</th><th>등록일</th><th>액션</th></tr>
+        <tr>
+          <td style="font-weight:500">DAILY SEOUL VLOG</td>
+          <td>이서울</td><td>라이프</td>
+          <td><span class="status-badge" style="background:var(--color-text-primary);color:var(--color-background-primary)">UPCOMING</span></td>
+          <td style="color:var(--color-text-tertiary)">–</td>
+          <td style="font-size:10px;color:var(--color-text-secondary)">2025.01.15</td>
+          <td><button class="action-btn primary">승인</button><button class="action-btn">반려</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">MUKBANG STATION</td>
+          <td>박먹방</td><td>푸드</td>
+          <td><span class="status-badge">ACTIVE</span></td>
+          <td>9.8만</td>
+          <td style="font-size:10px;color:var(--color-text-secondary)">2025.01.14</td>
+          <td><button class="action-btn primary">승인</button><button class="action-btn">반려</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:500">NOMAD KOREA</td>
+          <td>최여행</td><td>여행</td>
+          <td><span class="status-badge" style="background:var(--color-text-primary);color:var(--color-background-primary)">UPCOMING</span></td>
+          <td style="color:var(--color-text-tertiary)">–</td>
+          <td style="font-size:10px;color:var(--color-text-secondary)">2025.01.13</td>
+          <td><button class="action-btn primary">승인</button><button class="action-btn">반려</button></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  document.querySelectorAll('.filter-pill').forEach((b,i)=>{
+    const ids=['landing','modal','creator','sponsor','admin'];
+    b.classList.toggle('active',ids[i]===id);
+  });
+}
+</script>

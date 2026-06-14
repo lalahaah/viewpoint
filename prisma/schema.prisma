@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CREATOR
+  SPONSOR
+  ADMIN
+}
+
+enum ChannelStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum ChannelType {
+  ACTIVE
+  UPCOMING
+}
+
+enum ProposalStatus {
+  SENT
+  VIEWED
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  emailVerified    DateTime?
+  name             String?
+  password         String?
+  avatarUrl        String?
+  role             UserRole          @default(CREATOR)
+  subscriptionTier SubscriptionTier  @default(FREE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  channels          Channel[]
+  proposals         Proposal[]       @relation("SponsorProposals")
+  receivedProposals Proposal[]       @relation("CreatorProposals")
+  payments          Payment[]
+  creditBalance     CreditBalance?
+  accounts          Account[]
+  sessions          Session[]
+}
+
+model Channel {
+  id              String        @id @default(cuid())
+  creatorId       String
+  creator         User          @relation(fields: [creatorId], references: [id])
+  name            String
+  description     String        @db.Text
+  youtubeUrl      String?
+  thumbnailUrl    String?
+  channelType     ChannelType   @default(ACTIVE)
+  status          ChannelStatus @default(PENDING)
+  subscriberCount Int?
+  avgViews        Int?
+  uploadFrequency String?
+  launchDate      DateTime?
+  fundingGoal     Int?
+  fundingCurrent  Int           @default(0)
+  earlyBirdDeadline DateTime?
+  category        String
+  tags            String[]
+  adPrices        Json?
+  portfolioImages String[]
+  adminNote       String?
+  approvedAt      DateTime?
+  approvedBy      String?
+  isPremium       Boolean       @default(false)
+  viewCount       Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  proposals         Proposal[]
+  earlyBirdSponsors EarlyBirdSponsor[]
+}
+
+model Proposal {
+  id             String         @id @default(cuid())
+  channelId      String
+  channel        Channel        @relation(fields: [channelId], references: [id])
+  sponsorId      String
+  sponsor        User           @relation("SponsorProposals", fields: [sponsorId], references: [id])
+  creatorId      String
+  creator        User           @relation("CreatorProposals", fields: [creatorId], references: [id])
+  title          String
+  message        String         @db.Text
+  adType         String
+  proposedAmount Int
+  deadline       DateTime?
+  status         ProposalStatus @default(SENT)
+  viewedAt       DateTime?
+  respondedAt    DateTime?
+  completedAt    DateTime?
+  payment        Payment?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model EarlyBirdSponsor {
+  id            String        @id @default(cuid())
+  channelId     String
+  channel       Channel       @relation(fields: [channelId], references: [id])
+  sponsorId     String
+  amount        Int
+  paymentStatus PaymentStatus @default(PENDING)
+  dodoPaymentId String?
+  createdAt     DateTime      @default(now())
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  proposalId     String?       @unique
+  proposal       Proposal?     @relation(fields: [proposalId], references: [id])
+  amount         Int
+  platformFee    Int
+  netAmount      Int
+  dodoPaymentId  String?       @unique
+  dodoCheckoutId String?
+  status         PaymentStatus @default(PENDING)
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+}
+
+model CreditBalance {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  balance        Int      @default(3)
+  totalPurchased Int      @default(0)
+  totalUsed      Int      @default(0)
+  updatedAt      DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
