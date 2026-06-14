@@ -4,10 +4,12 @@ import { useState } from "react"
 import { ShuffleHero } from "@/components/landing/ShuffleHero"
 import ChannelGrid from "@/components/landing/ChannelGrid"
 import ChannelModal from "@/components/modals/ChannelModal"
+import BriefModal from "@/components/modals/BriefModal"
 import { Channel } from "@/lib/mockData"
 
 export default function HomePage() {
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null)
+  const [showBriefModal, setShowBriefModal] = useState(false)
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -25,15 +27,21 @@ export default function HomePage() {
       </div>
 
       <div className="w-full bg-white py-8">
-        <div className="container-main">
-          <ChannelGrid onChannelClick={setSelectedChannel} />
-        </div>
+        <ChannelGrid onChannelClick={setSelectedChannel} />
       </div>
 
       <ChannelModal
         channel={selectedChannel}
         onClose={() => setSelectedChannel(null)}
+        onBriefClick={() => setShowBriefModal(true)}
       />
+
+      {showBriefModal && selectedChannel && (
+        <BriefModal
+          channel={selectedChannel}
+          onClose={() => setShowBriefModal(false)}
+        />
+      )}
     </div>
   )
 }

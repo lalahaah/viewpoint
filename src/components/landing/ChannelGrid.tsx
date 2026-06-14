@@ -34,7 +34,7 @@ export default function ChannelGrid({ onChannelClick }: ChannelGridProps) {
   })
 
   return (
-    <div className="w-full bg-white">
+    <div className="max-w-screen-xl mx-auto px-6 bg-white">
       {/* Filter Bar */}
       <div className="border border-black py-6 px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center gap-6 overflow-hidden w-full lg:w-auto">

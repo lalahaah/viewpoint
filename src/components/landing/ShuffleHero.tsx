@@ -8,7 +8,7 @@ import { channels } from "@/lib/mockData"
 export const ShuffleHero = () => {
   return (
     <section className="w-full border-b border-black bg-white">
-      <div className="container-main grid grid-cols-1 md:grid-cols-2">
+      <div className="max-w-screen-xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2">
         {/* Left Content */}
         <div className="flex flex-col justify-center py-16 md:py-24 md:pr-8 border-b md:border-b-0 md:border-r border-black">
           <p className="uppercase tracking-widest text-[10px] sm:text-xs text-gray-500 mb-4 border border-black inline-block px-2.5 py-1 w-fit font-black bg-white">
@@ -22,17 +22,17 @@ export const ShuffleHero = () => {
             오픈 예정 채널을 가장 먼저 선점하는 얼리버드 스폰서십.
           </p>
           <div className="flex gap-0 border border-black w-fit rounded-none">
-            <a href="/signup?role=sponsor" className="bg-black text-white px-6 py-3 uppercase tracking-widest text-xs font-black hover:bg-white hover:text-black transition-colors border-r border-black rounded-none">
+            <a href="/signup?role=sponsor" className="bg-black text-white px-6 py-3 uppercase tracking-widest text-sm font-black hover:bg-white hover:text-black transition-colors border-r border-black rounded-none">
               광고주로 시작
             </a>
-            <a href="/signup?role=creator" className="px-6 py-3 uppercase tracking-widest text-xs font-black hover:bg-black hover:text-white transition-colors bg-white text-black rounded-none">
+            <a href="/signup?role=creator" className="px-6 py-3 uppercase tracking-widest text-sm font-black hover:bg-black hover:text-white transition-colors bg-white text-black rounded-none">
               채널 등록
             </a>
           </div>
         </div>
         
         {/* Right Shuffle Grid (Hidden on Mobile) */}
-        <div className="hidden md:flex items-center justify-center p-8 md:pl-8">
+        <div className="hidden md:grid items-center justify-center p-8 md:pl-8">
           <ShuffleGrid />
         </div>
       </div>

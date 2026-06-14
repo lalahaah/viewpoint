@@ -7,6 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─────────────────────────────────────────
+// ENUM
+// ─────────────────────────────────────────
+
 enum UserRole {
   CREATOR
   SPONSOR
@@ -25,13 +29,13 @@ enum ChannelType {
   UPCOMING
 }
 
-enum ProposalStatus {
-  SENT
-  VIEWED
-  ACCEPTED
-  REJECTED
-  CANCELLED
-  COMPLETED
+enum BriefStatus {
+  SENT        // 브리프 발송
+  VIEWED      // 크리에이터 열람
+  ACCEPTED    // 수락
+  REJECTED    // 거절
+  CANCELLED   // 광고주 취소
+  COMPLETED   // 협찬 완료
 }
 
 enum PaymentStatus {
@@ -46,21 +50,25 @@ enum SubscriptionTier {
   PREMIUM
 }
 
+// ─────────────────────────────────────────
+// MODELS
+// ─────────────────────────────────────────
+
 model User {
-  id               String            @id @default(cuid())
-  email            String            @unique
+  id               String           @id @default(cuid())
+  email            String           @unique
   emailVerified    DateTime?
   name             String?
   password         String?
   avatarUrl        String?
-  role             UserRole          @default(CREATOR)
-  subscriptionTier SubscriptionTier  @default(FREE)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  role             UserRole         @default(CREATOR)
+  subscriptionTier SubscriptionTier @default(FREE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   channels          Channel[]
-  proposals         Proposal[]       @relation("SponsorProposals")
-  receivedProposals Proposal[]       @relation("CreatorProposals")
+  sentBriefs        Brief[]          @relation("SponsorBriefs")
+  receivedBriefs    Brief[]          @relation("CreatorBriefs")
   payments          Payment[]
   creditBalance     CreditBalance?
   accounts          Account[]
@@ -71,55 +79,108 @@ model Channel {
   id              String        @id @default(cuid())
   creatorId       String
   creator         User          @relation(fields: [creatorId], references: [id])
+
+  // 기본 정보
   name            String
   description     String        @db.Text
-  youtubeUrl      String?
+  youtubeUrl      String?       // 모달에 링크로 노출
   thumbnailUrl    String?
   channelType     ChannelType   @default(ACTIVE)
   status          ChannelStatus @default(PENDING)
-  subscriberCount Int?
-  avgViews        Int?
-  uploadFrequency String?
+
+  // 채널 주요 지표 (수동 입력 — Phase 2에서 YouTube API 자동화)
+  subscriberCount Int?          // 구독자수
+  avgViews        Int?          // 평균 조회수
+  totalVideos     Int?          // 총 영상수
+  recentMonthViews Int?         // 최근 30일 조회수
+  subscriberGrowth Int?         // 최근 30일 구독자 증가
+  engagementRate  Float?        // 참여율 (%)
+  uploadFrequency String?       // "주 2회" 등
+  youtubeVerified Boolean       @default(false) // Phase 2: API 인증 여부
+
+  // 시청자 인구통계 (크리에이터 직접 입력 — YouTube Studio에서 확인 후 기입)
+  audienceGender  Json?
+  // 예시: { "male": 65, "female": 35 }
+
+  audienceAge     Json?
+  // 예시: { "13-17": 5, "18-24": 40, "25-34": 35, "35-44": 15, "45+": 5 }
+
+  audienceCountry Json?
+  // 예시: { "KR": 78, "US": 8, "JP": 5, "other": 9 }
+
+  audienceDevice  Json?
+  // 예시: { "mobile": 72, "desktop": 20, "tablet": 8 }
+
+  // 오픈 예정 채널 전용
   launchDate      DateTime?
   fundingGoal     Int?
   fundingCurrent  Int           @default(0)
   earlyBirdDeadline DateTime?
+
+  // 카테고리 & 태그
   category        String
   tags            String[]
+
+  // 광고 유형별 단가 + 제작기간 (JSON)
   adPrices        Json?
-  portfolioImages String[]
+  // 구조:
+  // {
+  //   "integrated": { "price": 3500000, "period": 14, "description": "영상 내 60-90초 브랜드 광고 삽입" },
+  //   "review":     { "price": 5000000, "period": 21, "description": "영상 전체 제품 리뷰" },
+  //   "mention":    { "price": 1000000, "period": 7,  "description": "영상 초반/후반 15-30초 언급" },
+  //   "shorts":     { "price": 1200000, "period": 5,  "description": "60초 이내 쇼츠 단독 제작" },
+  //   "community":  { "price": 300000,  "period": 2,  "description": "유튜브 커뮤니티탭 홍보" },
+  //   "earlyBird":  { "price": 2000000, "period": 30, "description": "UPCOMING 채널 사전 협찬" },
+  //   "package":    { "price": null,    "period": null, "description": "2개 이상 유형 묶음 (협의)" }
+  // }
+
+  // 협찬 사례
+  sponsorCases    Json?
+  // 구조: [{ "brandName": "삼성", "logoUrl": "...", "videoThumbUrl": "...", "videoUrl": "...", "adType": "integrated", "year": 2024 }]
+
+  // 미디어킷
+  mediaKitUrl     String?       // PDF URL (Supabase Storage)
+
+  // 관리자 액션
   adminNote       String?
   approvedAt      DateTime?
   approvedBy      String?
+
   isPremium       Boolean       @default(false)
   viewCount       Int           @default(0)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  proposals         Proposal[]
+  briefs            Brief[]
   earlyBirdSponsors EarlyBirdSponsor[]
 }
 
-model Proposal {
-  id             String         @id @default(cuid())
+model Brief {
+  id             String      @id @default(cuid())
   channelId      String
-  channel        Channel        @relation(fields: [channelId], references: [id])
+  channel        Channel     @relation(fields: [channelId], references: [id])
   sponsorId      String
-  sponsor        User           @relation("SponsorProposals", fields: [sponsorId], references: [id])
+  sponsor        User        @relation("SponsorBriefs", fields: [sponsorId], references: [id])
   creatorId      String
-  creator        User           @relation("CreatorProposals", fields: [creatorId], references: [id])
-  title          String
-  message        String         @db.Text
-  adType         String
-  proposedAmount Int
-  deadline       DateTime?
-  status         ProposalStatus @default(SENT)
+  creator        User        @relation("CreatorBriefs", fields: [creatorId], references: [id])
+
+  // 브리프 내용 (광고주가 작성)
+  brandName      String                        // 브랜드/회사명
+  productInfo    String      @db.Text          // 제품/서비스 소개
+  adType         String                        // 광고 유형 (integrated/review/mention/shorts/community/earlyBird/package)
+  budget         Int                           // 제안 예산 (원)
+  contentDirection String    @db.Text          // 희망 콘텐츠 방향
+  desiredDate    DateTime?                     // 희망 집행일
+  referenceUrl   String?                       // 참고 자료 URL
+
+  status         BriefStatus @default(SENT)
   viewedAt       DateTime?
   respondedAt    DateTime?
   completedAt    DateTime?
+
   payment        Payment?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 }
 
 model EarlyBirdSponsor {
@@ -137,11 +198,11 @@ model Payment {
   id             String        @id @default(cuid())
   userId         String
   user           User          @relation(fields: [userId], references: [id])
-  proposalId     String?       @unique
-  proposal       Proposal?     @relation(fields: [proposalId], references: [id])
+  briefId        String?       @unique
+  brief          Brief?        @relation(fields: [briefId], references: [id])
   amount         Int
-  platformFee    Int
-  netAmount      Int
+  platformFee    Int           // 플랫폼 수수료 10%
+  netAmount      Int           // 크리에이터 수령액
   dodoPaymentId  String?       @unique
   dodoCheckoutId String?
   status         PaymentStatus @default(PENDING)
