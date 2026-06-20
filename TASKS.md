@@ -89,16 +89,16 @@
 
 ---
 
-### STEP 4: 안내 & 고객지원 페이지
+### STEP 4: 안내 & 고객지원 페이지 ✅ 완료
 
-- [ ] **T-31** `src/components/shared/BentoGridShowcase.tsx`
-- [ ] **T-32** `src/components/shared/StatusBadge.tsx`
-- [ ] **T-33** `src/app/(public)/guide/creator/page.tsx`
-- [ ] **T-34** `src/app/(public)/guide/sponsor/page.tsx`
-- [ ] **T-35** `src/app/(public)/notice/page.tsx`
-- [ ] **T-36** `src/app/(public)/faq/page.tsx` (아코디언)
-- [ ] **T-37** `src/app/(public)/terms/page.tsx`
-- [ ] **T-38** `src/app/(public)/privacy/page.tsx`
+- [x] **T-31** `src/components/shared/BentoGridShowcase.tsx`
+- [x] **T-32** `src/components/shared/StatusBadge.tsx`
+- [x] **T-33** `src/app/(public)/guide/creator/page.tsx`
+- [x] **T-34** `src/app/(public)/guide/sponsor/page.tsx`
+- [x] **T-35** `src/app/(public)/notice/page.tsx`
+- [x] **T-36** `src/app/(public)/faq/page.tsx` (아코디언)
+- [x] **T-37** `src/app/(public)/terms/page.tsx`
+- [x] **T-38** `src/app/(public)/privacy/page.tsx`
 
 ---
 
@@ -198,10 +198,10 @@
 | Phase 1 — Step 2 | 8개 | 8개 | 100% ✅ |
 | Phase 1 — Step 3 | 6개 | 6개 | 100% ✅ |
 | Phase 1 — Step 3-1 | 6개 | 6개 | 100% ✅ |
-| Phase 1 — Step 4~9 | 43개 | 0개 | 0% |
+| Phase 1 — Step 4~9 | 43개 | 8개 | 18.6% |
 | Phase 2 | 6개 | 0개 | 0% |
 | Phase 3 | 6개 | 0개 | 0% |
-| **합계** | **85개** | **30개** | **35%** |
+| **합계** | **85개** | **38개** | **44.7%** |
 
 ---
 
@@ -212,7 +212,7 @@
 ✅ Step 2 완료
 ✅ Step 3 완료
 ✅ Step 3-1 완료
-⬜ Step 4: 안내 & 고객지원 페이지
+✅ Step 4 완료
 ⬜ Step 5: 크리에이터 대시보드
 ⬜ Step 6: 광고주 대시보드
 ⬜ Step 7: 어드민 패널
