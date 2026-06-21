@@ -102,28 +102,29 @@
 
 ---
 
-### STEP 5: 크리에이터 대시보드
+### STEP 5: 크리에이터 대시보드 ✅ 완료
 
-- [ ] **T-39** `src/app/(dashboard)/dashboard/creator/layout.tsx` (사이드바)
-- [ ] **T-40** `src/app/(dashboard)/dashboard/creator/page.tsx` (홈 스탯)
-- [ ] **T-41** `src/app/(dashboard)/dashboard/creator/channel/page.tsx`
+- [x] **T-39** `src/app/(dashboard)/dashboard/creator/layout.tsx` (사이드바)
+- [x] **T-40** `src/app/(dashboard)/dashboard/creator/page.tsx` (홈 스탯)
+- [x] **T-41** `src/app/(dashboard)/dashboard/creator/channel/page.tsx`
   - 채널 등록 폼에 신규 필드 전부 포함:
     * 채널 지표 (구독자수, 평균조회수, 참여율, 업로드주기, 총영상수, 최근30일조회수, 구독자증가)
     * 시청자 인구통계 (성별/연령/국가/기기 — % 입력)
     * 광고 유형별 단가 + 제작기간 입력 (7개 유형)
     * 미디어킷 PDF 업로드 (Supabase Storage)
     * 협찬 사례 등록 (브랜드명, 영상 URL)
-- [ ] **T-42** `src/app/(dashboard)/dashboard/creator/briefs/page.tsx` (받은 브리프)
-- [ ] **T-43** `src/app/(dashboard)/dashboard/creator/earnings/page.tsx`
+- [x] **T-42** `src/app/(dashboard)/dashboard/creator/briefs/page.tsx` (받은 브리프)
+- [x] **T-43** `src/app/(dashboard)/dashboard/creator/earnings/page.tsx`
 
 ---
 
-### STEP 6: 광고주 대시보드
+### STEP 6: 광고주 대시보드 ✅ 완료
 
-- [ ] **T-44** `src/app/(dashboard)/dashboard/sponsor/layout.tsx`
-- [ ] **T-45** `src/app/(dashboard)/dashboard/sponsor/page.tsx`
-- [ ] **T-46** `src/app/(dashboard)/dashboard/sponsor/briefs/page.tsx` (보낸 브리프)
-- [ ] **T-47** `src/app/(dashboard)/dashboard/sponsor/billing/page.tsx`
+- [x] **T-44** `src/app/(dashboard)/dashboard/sponsor/layout.tsx`
+- [x] **T-45** `src/app/(dashboard)/dashboard/sponsor/page.tsx`
+- [x] **T-46** `src/app/(dashboard)/dashboard/sponsor/briefs/page.tsx` (보낸 브리프)
+- [x] **T-47** `src/app/(dashboard)/dashboard/sponsor/billing/page.tsx`
+- [x] **T-47-1** `src/app/(dashboard)/dashboard/sponsor/earlybird/page.tsx` (얼리버드 추가 구현)
 
 ---
 
@@ -198,10 +199,10 @@
 | Phase 1 — Step 2 | 8개 | 8개 | 100% ✅ |
 | Phase 1 — Step 3 | 6개 | 6개 | 100% ✅ |
 | Phase 1 — Step 3-1 | 6개 | 6개 | 100% ✅ |
-| Phase 1 — Step 4~9 | 43개 | 8개 | 18.6% |
+| Phase 1 — Step 4~9 | 43개 | 18개 | 41.8% |
 | Phase 2 | 6개 | 0개 | 0% |
 | Phase 3 | 6개 | 0개 | 0% |
-| **합계** | **85개** | **38개** | **44.7%** |
+| **합계** | **85개** | **48개** | **56.4%** |
 
 ---
 
@@ -213,8 +214,8 @@
 ✅ Step 3 완료
 ✅ Step 3-1 완료
 ✅ Step 4 완료
-⬜ Step 5: 크리에이터 대시보드
-⬜ Step 6: 광고주 대시보드
+✅ Step 5 완료
+✅ Step 6 완료
 ⬜ Step 7: 어드민 패널
 ⬜ Step 8: API 구현
 ⬜ Step 9: QA + 빌드
