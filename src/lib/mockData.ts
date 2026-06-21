@@ -556,3 +556,50 @@ export const channels: Channel[] = [
     description: "전국 미술관 및 현대 미술 전시를 친절한 도슨트 해설과 함께 투어합니다."
   },
 ]
+
+export interface CreatorDashboardMock {
+  stats: {
+    totalChannels: number
+    totalBriefs: number
+    monthlyEarnings: number
+    totalViews: number
+  }
+  recentBriefs: Array<{
+    id: string
+    brandName: string
+    adType: string
+    budget: number
+    status: "SENT" | "VIEWED" | "ACCEPTED" | "REJECTED" | "CANCELLED" | "COMPLETED"
+    createdAt: string
+  }>
+  earnings: Array<{
+    id: string
+    date: string
+    sponsor: string
+    amount: number
+    fee: number
+    netAmount: number
+    status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED"
+  }>
+}
+
+export const creatorDashboardMock: CreatorDashboardMock = {
+  stats: {
+    totalChannels: 2,
+    totalBriefs: 8,
+    monthlyEarnings: 4500000,
+    totalViews: 5000000
+  },
+  recentBriefs: [
+    { id: "b-1", brandName: "삼성전자", adType: "integrated", budget: 3500000, status: "SENT", createdAt: "2026-06-20T10:00:00Z" },
+    { id: "b-2", brandName: "올리브영", adType: "review", budget: 4800000, status: "ACCEPTED", createdAt: "2026-06-18T14:30:00Z" },
+    { id: "b-3", brandName: "로지텍", adType: "mention", budget: 1500000, status: "REJECTED", createdAt: "2026-06-15T09:00:00Z" },
+    { id: "b-4", brandName: "넷마블", adType: "shorts", budget: 2500000, status: "COMPLETED", createdAt: "2026-06-10T11:00:00Z" }
+  ],
+  earnings: [
+    { id: "e-1", date: "2026-06-20", sponsor: "올리브영", amount: 4800000, fee: 480000, netAmount: 4320000, status: "COMPLETED" },
+    { id: "e-2", date: "2026-06-15", sponsor: "로지텍", amount: 1500000, fee: 150000, netAmount: 1350000, status: "PENDING" },
+    { id: "e-3", date: "2026-06-10", sponsor: "넷마블", amount: 2500000, fee: 250000, netAmount: 2250000, status: "COMPLETED" }
+  ]
+}
+
