@@ -14,6 +14,7 @@ const statusMap: Record<string, string> = {
   ACCEPTED: "수락",
   CANCELLED: "취소",
   COMPLETED: "완료",
+  FAILED: "실패",
 }
 
 export const StatusBadge = ({ status }: StatusBadgeProps) => {

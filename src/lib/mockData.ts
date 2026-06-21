@@ -658,4 +658,90 @@ export const sponsorDashboardMock: SponsorDashboardMock = {
   ]
 }
 
+export interface AdminDashboardMock {
+  stats: {
+    totalUsers: number
+    pendingToday: number
+    monthlyVolume: number
+    platformRevenue: number
+  }
+  pendingChannels: Array<{
+    id: string
+    channelName: string
+    creatorName: string
+    category: string
+    type: "ACTIVE" | "UPCOMING"
+    createdAt: string
+  }>
+  users: Array<{
+    id: string
+    name: string
+    email: string
+    role: "CREATOR" | "SPONSOR" | "ADMIN"
+    joinedAt: string
+    channelCount: number
+    briefCount: number
+    status: "ACTIVE" | "SUSPENDED"
+  }>
+  allBriefs: Array<{
+    id: string
+    sponsorName: string
+    creatorName: string
+    channelName: string
+    adType: string
+    budget: number
+    status: "SENT" | "VIEWED" | "ACCEPTED" | "REJECTED" | "CANCELLED" | "COMPLETED"
+    sentAt: string
+  }>
+  settlements: Array<{
+    id: string
+    date: string
+    sponsor: string
+    creator: string
+    amount: number
+    fee: number
+    netAmount: number
+    status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED"
+  }>
+}
+
+export const adminDashboardMock: AdminDashboardMock = {
+  stats: {
+    totalUsers: 142,
+    pendingToday: 3,
+    monthlyVolume: 12500000,
+    platformRevenue: 1250000
+  },
+  pendingChannels: [
+    { id: "pc-1", channelName: "시네마 헤븐 Cinema Heaven", creatorName: "김영화", category: "라이프", type: "ACTIVE", createdAt: "2026-06-21" },
+    { id: "pc-2", channelName: "캠핑 마니아 Camping Mania", creatorName: "이캠핑", category: "여행", type: "ACTIVE", createdAt: "2026-06-20" },
+    { id: "pc-3", channelName: "글로벌 홈 셰프", creatorName: "박요리", category: "푸드", type: "UPCOMING", createdAt: "2026-06-19" }
+  ],
+  users: [
+    { id: "u-1", name: "김크리에이터", email: "creator1@viewpoint.com", role: "CREATOR", joinedAt: "2026-05-15", channelCount: 2, briefCount: 4, status: "ACTIVE" },
+    { id: "u-2", name: "이광고주", email: "sponsor1@samsung.com", role: "SPONSOR", joinedAt: "2026-05-18", channelCount: 0, briefCount: 3, status: "ACTIVE" },
+    { id: "u-3", name: "박어드민", email: "admin@viewpoint.com", role: "ADMIN", joinedAt: "2026-05-01", channelCount: 0, briefCount: 0, status: "ACTIVE" },
+    { id: "u-4", name: "최요리", email: "cook@gmail.com", role: "CREATOR", joinedAt: "2026-05-20", channelCount: 1, briefCount: 2, status: "ACTIVE" },
+    { id: "u-5", name: "정뷰티", email: "beauty@naver.com", role: "CREATOR", joinedAt: "2026-05-25", channelCount: 1, briefCount: 1, status: "SUSPENDED" },
+    { id: "u-6", name: "한광고", email: "marketing@lg.com", role: "SPONSOR", joinedAt: "2026-06-01", channelCount: 0, briefCount: 5, status: "ACTIVE" },
+    { id: "u-7", name: "강테크", email: "tech@daum.net", role: "CREATOR", joinedAt: "2026-06-05", channelCount: 1, briefCount: 0, status: "ACTIVE" }
+  ],
+  allBriefs: [
+    { id: "ab-1", sponsorName: "삼성전자", creatorName: "테크웨이브", channelName: "테크웨이브 TechWave", adType: "integrated", budget: 3500000, status: "SENT", sentAt: "2026-06-20T10:00:00Z" },
+    { id: "ab-2", sponsorName: "올리브영", creatorName: "뷰티 크러쉬", channelName: "뷰티 크러쉬 Beauty Crush", adType: "review", budget: 4800000, status: "ACCEPTED", sentAt: "2026-06-18T14:30:00Z" },
+    { id: "ab-3", sponsorName: "로지텍", creatorName: "테크웨이브", channelName: "테크웨이브 TechWave", adType: "mention", budget: 1500000, status: "REJECTED", sentAt: "2026-06-15T09:00:00Z" },
+    { id: "ab-4", sponsorName: "넷마블", creatorName: "겜블러 플레이", channelName: "겜블러 플레이 Gambler Play", adType: "shorts", budget: 2500000, status: "COMPLETED", sentAt: "2026-06-10T11:00:00Z" },
+    { id: "ab-5", sponsorName: "트리플", creatorName: "도쿄 한달살기", channelName: "도쿄 한달살기 Tokyo Live", adType: "integrated", budget: 1500000, status: "REJECTED", sentAt: "2026-06-05T08:00:00Z" },
+    { id: "ab-6", sponsorName: "오뚜기", creatorName: "자취생 레시피", channelName: "자취생 레시피 Easy Meal", adType: "shorts", budget: 1500000, status: "COMPLETED", sentAt: "2026-05-28T09:00:00Z" }
+  ],
+  settlements: [
+    { id: "s-1", date: "2026-06-20", sponsor: "올리브영", creator: "뷰티 크러쉬", amount: 4800000, fee: 480000, netAmount: 4320000, status: "COMPLETED" },
+    { id: "s-2", date: "2026-06-18", sponsor: "삼성전자", creator: "테크웨이브", amount: 3500000, fee: 350000, netAmount: 3150000, status: "PENDING" },
+    { id: "s-3", date: "2026-06-15", sponsor: "로지텍", creator: "테크웨이브", amount: 1500000, fee: 150000, netAmount: 1350000, status: "PENDING" },
+    { id: "s-4", date: "2026-06-10", sponsor: "넷마블", creator: "겜블러 플레이", amount: 2500000, fee: 250000, netAmount: 2250000, status: "COMPLETED" },
+    { id: "s-5", date: "2026-06-01", sponsor: "트리플", creator: "도쿄 한달살기", amount: 1500000, fee: 150000, netAmount: 1350000, status: "FAILED" }
+  ]
+}
+
+
 
