@@ -603,3 +603,59 @@ export const creatorDashboardMock: CreatorDashboardMock = {
   ]
 }
 
+export interface SponsorDashboardMock {
+  stats: {
+    creditBalance: number
+    totalBriefs: number
+    completedDeals: number
+    totalSpent: number
+  }
+  recentBriefs: Array<{
+    id: string
+    channelName: string
+    brandName: string
+    adType: string
+    budget: number
+    status: "SENT" | "VIEWED" | "ACCEPTED" | "REJECTED" | "CANCELLED" | "COMPLETED"
+    sentAt: string
+  }>
+  billingHistory: Array<{
+    id: string
+    date: string
+    item: string
+    amount: number
+    status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED"
+  }>
+  earlyBirdHistory: Array<{
+    id: string
+    channelName: string
+    amount: number
+    fundingProgress: number
+    status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED"
+  }>
+}
+
+export const sponsorDashboardMock: SponsorDashboardMock = {
+  stats: {
+    creditBalance: 2,
+    totalBriefs: 5,
+    completedDeals: 2,
+    totalSpent: 7300000
+  },
+  recentBriefs: [
+    { id: "sb-1", channelName: "테크웨이브 TechWave", brandName: "삼성전자", adType: "integrated", budget: 3500000, status: "SENT", sentAt: "2026-06-20T10:00:00Z" },
+    { id: "sb-2", channelName: "뷰티 크러쉬 Beauty Crush", brandName: "올리브영", adType: "review", budget: 4800000, status: "ACCEPTED", sentAt: "2026-06-18T14:30:00Z" },
+    { id: "sb-3", channelName: "겜블러 플레이 Gambler Play", brandName: "넷마블", adType: "shorts", budget: 2500000, status: "COMPLETED", sentAt: "2026-06-10T11:00:00Z" }
+  ],
+  billingHistory: [
+    { id: "sh-1", date: "2026-06-21", item: "STARTER (5 크레딧)", amount: 49000, status: "COMPLETED" },
+    { id: "sh-2", date: "2026-06-10", item: "GROWTH (20 크레딧)", amount: 149000, status: "COMPLETED" },
+    { id: "sh-3", date: "2026-06-01", item: "STARTER (5 크레딧)", amount: 49000, status: "FAILED" }
+  ],
+  earlyBirdHistory: [
+    { id: "eb-1", channelName: "프로젝트 X 코딩방 (Project X)", amount: 1000000, fundingProgress: 25, status: "COMPLETED" },
+    { id: "eb-2", channelName: "미식 메이트 Gourmet Mate", amount: 800000, fundingProgress: 70, status: "COMPLETED" }
+  ]
+}
+
+
