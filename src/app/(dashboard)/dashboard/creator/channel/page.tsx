@@ -113,7 +113,7 @@ export default function CreatorChannelPage() {
     setSponsorCases((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const handleSponsorCaseChange = (index: number, field: keyof SponsorCaseInput, value: any) => {
+  const handleSponsorCaseChange = (index: number, field: keyof SponsorCaseInput, value: string | number) => {
     setSponsorCases((prev) =>
       prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
     )
@@ -149,7 +149,10 @@ export default function CreatorChannelPage() {
     })
 
     // Format ad prices output
-    const formattedAdPrices: Record<string, any> = {}
+    const formattedAdPrices: Record<
+      string,
+      { price: number | null; period: number | null; description: string }
+    > = {}
     Object.entries(adPrices).forEach(([key, value]) => {
       formattedAdPrices[key] = {
         price: value.price ? parseInt(value.price, 10) : null,

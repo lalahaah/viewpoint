@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,11 +31,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col justify-between bg-white text-black`}
       >
-        <div className="flex flex-col flex-grow">
-          <Navigation />
-          <main className="flex-grow">{children}</main>
-        </div>
-        <Footer />
+        <SessionProvider>
+          <div className="flex flex-col flex-grow">
+            <Navigation />
+            <main className="flex-grow">{children}</main>
+          </div>
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );
