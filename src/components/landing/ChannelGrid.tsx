@@ -2,10 +2,11 @@
 "use client"
 
 import { useFilterStore } from "@/store/filterStore"
-import { channels, Channel } from "@/lib/mockData"
+import { Channel } from "@/lib/mockData"
 import ChannelCard from "./ChannelCard"
 
 interface ChannelGridProps {
+  channels: Channel[]
   onChannelClick: (channel: Channel) => void
 }
 
@@ -16,7 +17,7 @@ const TYPES = [
   { label: "오픈예정", value: "UPCOMING" },
 ]
 
-export default function ChannelGrid({ onChannelClick }: ChannelGridProps) {
+export default function ChannelGrid({ channels, onChannelClick }: ChannelGridProps) {
   const { category, channelType, searchQuery, setCategory, setChannelType, setSearchQuery } = useFilterStore()
 
   const filteredChannels = channels.filter((channel) => {

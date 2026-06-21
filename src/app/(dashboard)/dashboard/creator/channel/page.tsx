@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { channels as mockChannels } from "@/lib/mockData"
 import { StatusBadge } from "@/components/shared/StatusBadge"
+import { useSession } from "next-auth/react"
+import { Channel } from "@prisma/client"
 
 interface SponsorCaseInput {
   brandName: string
@@ -19,7 +20,9 @@ interface AdPriceInput {
 }
 
 export default function CreatorChannelPage() {
-  const [channels, setChannels] = useState(mockChannels.slice(0, 2)) // Mocking creator's channels
+  const { data: session } = useSession()
+  const [channels, setChannels] = useState<Channel[]>([])
+  const [loading, setLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   // Basic info states
@@ -101,6 +104,30 @@ export default function CreatorChannelPage() {
   // Sponsor Cases (dynamic)
   const [sponsorCases, setSponsorCases] = useState<SponsorCaseInput[]>([])
 
+  const fetchChannels = useCallback(async () => {
+    try {
+      setLoading(true)
+      const res = await fetch("/api/channels")
+      const json = await res.json()
+      if (json.success && session?.user?.id) {
+        const myChannels = json.data.channels.filter(
+          (c: Channel) => c.creatorId === session.user.id
+        )
+        setChannels(myChannels)
+      }
+    } catch (err) {
+      console.error("Failed to load channels", err)
+    } finally {
+      setLoading(false)
+    }
+  }, [session])
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchChannels()
+    }
+  }, [session, fetchChannels])
+
   const addSponsorCase = () => {
     if (sponsorCases.length >= 5) return
     setSponsorCases((prev) => [
@@ -131,16 +158,59 @@ export default function CreatorChannelPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setName("")
+    setChannelType("ACTIVE")
+    setCategory("테크")
+    setTagsInput("")
+    setDescription("")
+    setYoutubeUrl("")
+    setUploadFrequency("")
+    setSubscriberCount("")
+    setAvgViews("")
+    setTotalVideos("")
+    setRecentMonthViews("")
+    setSubscriberGrowth("")
+    setEngagementRate("")
+    setLaunchDate("")
+    setFundingGoal("")
+    setEarlyBirdDeadline("")
+    setGenderMale("")
+    setGenderFemale("")
+    setAge13_17("")
+    setAge18_24("")
+    setAge25_34("")
+    setAge35_44("")
+    setAge45_plus("")
+    setCountries([
+      { country: "", percentage: "" },
+      { country: "", percentage: "" },
+      { country: "", percentage: "" },
+    ])
+    setDeviceMobile("")
+    setDeviceDesktop("")
+    setDeviceTablet("")
+    setAdPrices({
+      integrated: { price: "", period: "", description: "" },
+      review: { price: "", period: "", description: "" },
+      mention: { price: "", period: "", description: "" },
+      shorts: { price: "", period: "", description: "" },
+      community: { price: "", period: "", description: "" },
+      earlyBird: { price: "", period: "", description: "" },
+      package: { price: "", period: "", description: "" },
+    })
+    setPdfFileName(null)
+    setSponsorCases([])
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Transform and sanitize tags
     const tags = tagsInput
       .split(",")
       .map((t) => t.trim())
       .filter((t) => t.length > 0)
 
-    // Format audience country object
     const audienceCountry: Record<string, number> = {}
     countries.forEach((c) => {
       if (c.country && c.percentage) {
@@ -148,7 +218,6 @@ export default function CreatorChannelPage() {
       }
     })
 
-    // Format ad prices output
     const formattedAdPrices: Record<
       string,
       { price: number | null; period: number | null; description: string }
@@ -161,7 +230,7 @@ export default function CreatorChannelPage() {
       }
     })
 
-    // Final payload
+    // Flatten demographics metrics for simple POST payload matching Prisma schema
     const payload = {
       name,
       channelType,
@@ -170,50 +239,76 @@ export default function CreatorChannelPage() {
       description,
       youtubeUrl,
       uploadFrequency,
-      metrics: channelType === "ACTIVE" ? {
-        subscriberCount: subscriberCount ? parseInt(subscriberCount, 10) : null,
-        avgViews: avgViews ? parseInt(avgViews, 10) : null,
-        totalVideos: totalVideos ? parseInt(totalVideos, 10) : null,
-        recentMonthViews: recentMonthViews ? parseInt(recentMonthViews, 10) : null,
-        subscriberGrowth: subscriberGrowth ? parseInt(subscriberGrowth, 10) : null,
-        engagementRate: engagementRate ? parseFloat(engagementRate) : null,
-      } : null,
-      upcoming: channelType === "UPCOMING" ? {
-        launchDate,
-        fundingGoal: fundingGoal ? parseInt(fundingGoal, 10) : null,
-        earlyBirdDeadline,
-      } : null,
-      demographics: {
-        gender: {
-          male: genderMale ? parseFloat(genderMale) : null,
-          female: genderFemale ? parseFloat(genderFemale) : null,
-        },
-        age: {
-          "13-17": age13_17 ? parseFloat(age13_17) : null,
-          "18-24": age18_24 ? parseFloat(age18_24) : null,
-          "25-34": age25_34 ? parseFloat(age25_34) : null,
-          "35-44": age35_44 ? parseFloat(age35_44) : null,
-          "45+": age45_plus ? parseFloat(age45_plus) : null,
-        },
-        countries: audienceCountry,
-        device: {
-          mobile: deviceMobile ? parseFloat(deviceMobile) : null,
-          desktop: deviceDesktop ? parseFloat(deviceDesktop) : null,
-          tablet: deviceTablet ? parseFloat(deviceTablet) : null,
-        }
+      subscriberCount: subscriberCount ? parseInt(subscriberCount, 10) : null,
+      avgViews: avgViews ? parseInt(avgViews, 10) : null,
+      totalVideos: totalVideos ? parseInt(totalVideos, 10) : null,
+      recentMonthViews: recentMonthViews ? parseInt(recentMonthViews, 10) : null,
+      subscriberGrowth: subscriberGrowth ? parseInt(subscriberGrowth, 10) : null,
+      engagementRate: engagementRate ? parseFloat(engagementRate) : null,
+      launchDate: launchDate || null,
+      fundingGoal: fundingGoal ? parseInt(fundingGoal, 10) : null,
+      earlyBirdDeadline: earlyBirdDeadline || null,
+      audienceGender: {
+        male: genderMale ? parseFloat(genderMale) : null,
+        female: genderFemale ? parseFloat(genderFemale) : null,
+      },
+      audienceAge: {
+        "13-17": age13_17 ? parseFloat(age13_17) : null,
+        "18-24": age18_24 ? parseFloat(age18_24) : null,
+        "25-34": age25_34 ? parseFloat(age25_34) : null,
+        "35-44": age35_44 ? parseFloat(age35_44) : null,
+        "45+": age45_plus ? parseFloat(age45_plus) : null,
+      },
+      audienceCountry,
+      audienceDevice: {
+        mobile: deviceMobile ? parseFloat(deviceMobile) : null,
+        desktop: deviceDesktop ? parseFloat(deviceDesktop) : null,
+        tablet: deviceTablet ? parseFloat(deviceTablet) : null,
       },
       adPrices: formattedAdPrices,
-      pdfFileName,
+      mediaKitUrl: pdfFileName,
       sponsorCases,
     }
 
-    console.log("Submit Form Data:", JSON.stringify(payload, null, 2))
-    alert("채널 정보가 콘솔에 출력되었습니다. (개발자 도구를 확인하세요)")
+    try {
+      const res = await fetch("/api/channels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json()
+
+      if (json.success) {
+        alert("채널이 성공적으로 등록되었습니다. (관리자 승인 대기)")
+        resetForm()
+        setIsFormOpen(false)
+        fetchChannels()
+      } else {
+        alert(`채널 등록 실패: ${json.error}`)
+      }
+    } catch (err) {
+      console.error(err)
+      alert("채널 등록 중 네트워크 오류가 발생했습니다.")
+    }
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("채널을 삭제하시겠습니까?")) {
-      setChannels((prev) => prev.filter((ch) => ch.id !== id))
+      try {
+        const res = await fetch(`/api/channels/${id}`, {
+          method: "DELETE",
+        })
+        const json = await res.json()
+        if (json.success) {
+          alert("채널이 삭제되었습니다.")
+          fetchChannels()
+        } else {
+          alert(`삭제 실패: ${json.error}`)
+        }
+      } catch (err) {
+        console.error(err)
+        alert("삭제 중 오류가 발생했습니다.")
+      }
     }
   }
 
@@ -805,7 +900,9 @@ export default function CreatorChannelPage() {
       <div className="space-y-4">
         <h2 className="uppercase text-xs tracking-widest text-gray-400 font-bold">등록된 채널 목록</h2>
         <div className="border border-black bg-white divide-y divide-black">
-          {channels.length === 0 ? (
+          {loading ? (
+            <div className="p-8 text-center text-gray-500 text-sm">로딩중...</div>
+          ) : channels.length === 0 ? (
             <div className="p-8 text-center text-gray-500 text-sm">등록된 채널이 없습니다.</div>
           ) : (
             channels.map((channel) => (
@@ -837,7 +934,7 @@ export default function CreatorChannelPage() {
                   </div>
                   <p className="text-sm text-gray-600 line-clamp-2">{channel.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {channel.tags.map((tag) => (
+                    {channel.tags.map((tag: string) => (
                       <span key={tag} className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 border border-black rounded-full bg-white text-black">
                         #{tag}
                       </span>
