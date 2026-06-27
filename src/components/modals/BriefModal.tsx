@@ -32,6 +32,7 @@ export default function BriefModal({ channel, onClose }: BriefModalProps) {
   
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   if (!channel) return null
 
@@ -47,6 +48,7 @@ export default function BriefModal({ channel, onClose }: BriefModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
 
     const briefData = {
       channelId: channel.id,
@@ -59,24 +61,39 @@ export default function BriefModal({ channel, onClose }: BriefModalProps) {
       referenceUrl: referenceUrl || null,
     }
 
-    console.log("Submitting brief:", briefData)
+    try {
+      const res = await fetch("/api/briefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(briefData)
+      })
 
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+      const result = await res.json()
 
-    setSuccess(true)
-    setLoading(false)
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || "브리프 발송에 실패했습니다.")
+      }
 
-    setTimeout(() => {
-      onClose()
-      setBrandName("")
-      setProductInfo("")
-      setAdType("integrated")
-      setBudget("")
-      setContentDirection("")
-      setDesiredDate("")
-      setReferenceUrl("")
-      setSuccess(false)
-    }, 2000)
+      setSuccess(true)
+      setLoading(false)
+
+      setTimeout(() => {
+        onClose()
+        setBrandName("")
+        setProductInfo("")
+        setAdType("integrated")
+        setBudget("")
+        setContentDirection("")
+        setDesiredDate("")
+        setReferenceUrl("")
+        setSuccess(false)
+      }, 2000)
+
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message)
+      setLoading(false)
+    }
   }
 
   return (
@@ -251,7 +268,20 @@ export default function BriefModal({ channel, onClose }: BriefModalProps) {
               </div>
 
               {/* Action Button */}
-              <div className="p-6 bg-white border-t border-black">
+              <div className="p-6 bg-white border-t border-black space-y-4">
+                {error && (
+                  <div className="border border-black p-4 bg-red-50 rounded-none text-xs font-black text-black space-y-2">
+                    <p className="text-red-600 font-bold">오류: {error}</p>
+                    {error.includes("크레딧") && (
+                      <a
+                        href="/dashboard/sponsor/billing"
+                        className="inline-block bg-black text-white px-3 py-1.5 uppercase tracking-widest text-[10px] hover:bg-white hover:text-black border border-black transition-colors rounded-none"
+                      >
+                        크레딧 충전하기
+                      </a>
+                    )}
+                  </div>
+                )}
                 <button
                   type="submit"
                   disabled={loading}

@@ -1,93 +1,74 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { channels as mockActiveChannels } from "@/lib/mockData"
+
+interface Creator {
+  id: string
+  name: string | null
+  email: string
+}
 
 interface ChannelItem {
   id: string
   name: string
-  creatorName: string
+  creator?: Creator
   category: string
   channelType: "ACTIVE" | "UPCOMING"
   subscriberCount: number
   createdAt: string
   status: "PENDING" | "APPROVED" | "REJECTED"
-  rejectReason?: string
+  adminNote?: string | null
 }
 
-// Prepare initial state from mockData + new entries
-const initialChannels: ChannelItem[] = [
-  // Existing approved mock channels mapped to item format
-  ...mockActiveChannels.map((c) => ({
-    id: c.id,
-    name: c.name,
-    creatorName: c.id === "ch-1" ? "김테크" : c.id === "ch-2" ? "이뷰티" : "박크리에이터",
-    category: c.category,
-    channelType: c.channelType,
-    subscriberCount: c.subscriberCount || 0,
-    createdAt: "2026-06-01",
-    status: c.status as "PENDING" | "APPROVED" | "REJECTED",
-  })),
-  // Add some mock pending and rejected channels
-  {
-    id: "ch-pending-1",
-    name: "시네마 헤븐 Cinema Heaven",
-    creatorName: "김영화",
-    category: "라이프",
-    channelType: "ACTIVE",
-    subscriberCount: 45000,
-    createdAt: "2026-06-21",
-    status: "PENDING"
-  },
-  {
-    id: "ch-pending-2",
-    name: "캠핑 마니아 Camping Mania",
-    creatorName: "이캠핑",
-    category: "여행",
-    channelType: "ACTIVE",
-    subscriberCount: 12000,
-    createdAt: "2026-06-20",
-    status: "PENDING"
-  },
-  {
-    id: "ch-pending-3",
-    name: "글로벌 홈 셰프",
-    creatorName: "박요리",
-    category: "푸드",
-    channelType: "UPCOMING",
-    subscriberCount: 0,
-    createdAt: "2026-06-19",
-    status: "PENDING"
-  },
-  {
-    id: "ch-rejected-1",
-    name: "비실용 정보 쇼츠",
-    creatorName: "정대충",
-    category: "테크",
-    channelType: "ACTIVE",
-    subscriberCount: 5000,
-    createdAt: "2026-05-15",
-    status: "REJECTED",
-    rejectReason: "콘텐츠 퀄리티 미흡 및 스팸성 업로드 확인"
-  }
-]
-
 export default function AdminChannelsPage() {
-  const [channels, setChannels] = useState<ChannelItem[]>(initialChannels)
+  const [channels, setChannels] = useState<ChannelItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"PENDING" | "APPROVED" | "REJECTED">("PENDING")
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState("")
 
+  const fetchChannels = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch("/api/admin/channels")
+      const result = await res.json()
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || "채널 목록을 가져오는데 실패했습니다.")
+      }
+      setChannels(result.data.channels)
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchChannels()
+  }, [])
+
   const filteredChannels = channels.filter((ch) => ch.status === activeTab)
   const pendingCount = channels.filter((ch) => ch.status === "PENDING").length
 
-  const handleApprove = (id: string) => {
+  const handleApprove = async (id: string) => {
     if (confirm("이 채널을 승인하시겠습니까?")) {
-      setChannels((prev) =>
-        prev.map((ch) => (ch.id === id ? { ...ch, status: "APPROVED" } : ch))
-      )
-      alert("채널이 승인되었습니다. (API는 Step 8에서 연결됩니다)")
+      try {
+        const res = await fetch(`/api/admin/channels/${id}/approve`, {
+          method: "POST"
+        })
+        const result = await res.json()
+        if (!res.ok || !result.success) {
+          throw new Error(result.error || "채널 승인에 실패했습니다.")
+        }
+        alert("채널이 승인되었습니다.")
+        fetchChannels()
+      } catch (err: any) {
+        alert(err.message)
+      }
     }
   }
 
@@ -96,25 +77,63 @@ export default function AdminChannelsPage() {
     setRejectReason("")
   }
 
-  const handleRejectConfirm = (id: string) => {
+  const handleRejectConfirm = async (id: string) => {
     if (!rejectReason.trim()) {
       alert("반려 사유를 입력해주세요.")
       return
     }
-    setChannels((prev) =>
-      prev.map((ch) =>
-        ch.id === id
-          ? { ...ch, status: "REJECTED", rejectReason: rejectReason.trim() }
-          : ch
-      )
-    )
-    setRejectingId(null)
-    setRejectReason("")
-    alert("채널 심사가 반려 처리되었습니다.")
+    try {
+      const res = await fetch(`/api/admin/channels/${id}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: rejectReason.trim() })
+      })
+      const result = await res.json()
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || "채널 반려에 실패했습니다.")
+      }
+      alert("채널 심사가 반려 처리되었습니다.")
+      setRejectingId(null)
+      setRejectReason("")
+      fetchChannels()
+    } catch (err: any) {
+      alert(err.message)
+    }
   }
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat("ko-KR").format(num)
+  }
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr)
+      return date.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })
+    } catch {
+      return dateStr
+    }
+  }
+
+  if (loading && channels.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="font-bold text-sm tracking-wider uppercase">Loading channels...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="border border-black p-6 bg-red-50 text-center max-w-xl mx-auto rounded-none">
+        <p className="text-red-600 font-bold mb-4">{error}</p>
+        <button
+          onClick={fetchChannels}
+          className="bg-black text-white px-4 py-2 text-xs font-bold border border-black hover:bg-white hover:text-black transition-colors rounded-none"
+        >
+          다시 시도
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -173,7 +192,7 @@ export default function AdminChannelsPage() {
             {filteredChannels.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                  해당하는 채널 내역이 없습니다.
+                  해당하는 채널 심사 내역이 없습니다.
                 </td>
               </tr>
             ) : (
@@ -183,7 +202,7 @@ export default function AdminChannelsPage() {
                   <React.Fragment key={ch.id}>
                     <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 font-bold">{ch.name}</td>
-                      <td className="px-6 py-4">{ch.creatorName}</td>
+                      <td className="px-6 py-4">{ch.creator?.name || ch.creator?.email || "–"}</td>
                       <td className="px-6 py-4">{ch.category}</td>
                       <td className="px-6 py-4">
                         <span className="text-xs uppercase font-bold border border-black px-2 py-0.5 bg-gray-50">
@@ -191,21 +210,21 @@ export default function AdminChannelsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {ch.channelType === "ACTIVE" ? formatNumber(ch.subscriberCount) : "–"}
+                        {ch.channelType === "ACTIVE" ? formatNumber(ch.subscriberCount || 0) : "–"}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">{ch.createdAt}</td>
+                      <td className="px-6 py-4 text-gray-500">{formatDate(ch.createdAt)}</td>
                       <td className="px-6 py-4 text-center">
                         {ch.status === "PENDING" ? (
                           <div className="flex gap-2 justify-center">
                             <button
                               onClick={() => handleApprove(ch.id)}
-                              className="bg-black text-white border border-black px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-white hover:text-black transition-colors"
+                              className="bg-black text-white border border-black px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-white hover:text-black transition-colors rounded-none"
                             >
                               승인
                             </button>
                             <button
                               onClick={() => handleRejectStart(ch.id)}
-                              className="bg-white text-black border border-black px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-black hover:text-white transition-colors"
+                              className="bg-white text-black border border-black px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-black hover:text-white transition-colors rounded-none"
                             >
                               반려
                             </button>
@@ -215,9 +234,9 @@ export default function AdminChannelsPage() {
                         ) : (
                           <div className="text-center space-y-1">
                             <span className="text-red-500 font-bold uppercase text-xs tracking-wider block">반려됨</span>
-                            {ch.rejectReason && (
-                              <span className="text-[10px] text-gray-400 block max-w-xs mx-auto truncate" title={ch.rejectReason}>
-                                사유: {ch.rejectReason}
+                            {ch.adminNote && (
+                              <span className="text-[10px] text-gray-400 block max-w-xs mx-auto truncate" title={ch.adminNote}>
+                                사유: {ch.adminNote}
                               </span>
                             )}
                           </div>
@@ -244,19 +263,19 @@ export default function AdminChannelsPage() {
                                   onChange={(e) => setRejectReason(e.target.value)}
                                   rows={3}
                                   required
-                                  className="w-full rounded-none border border-black p-3 text-sm focus:outline-none focus:ring-1 focus:ring-black resize-none bg-white"
+                                  className="w-full rounded-none border border-black p-3 text-sm focus:outline-none focus:ring-1 focus:ring-black resize-none bg-white font-bold"
                                   placeholder="크리에이터에게 전달할 명확한 반려 사유를 기입하세요."
                                 />
                                 <div className="flex justify-end gap-2">
                                   <button
                                     onClick={() => handleRejectConfirm(ch.id)}
-                                    className="bg-black text-white border border-black px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+                                    className="bg-black text-white border border-black px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors rounded-none"
                                   >
                                     반려 확정
                                   </button>
                                   <button
                                     onClick={() => setRejectingId(null)}
-                                    className="bg-white text-black border border-black px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors"
+                                    className="bg-white text-black border border-black px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors rounded-none"
                                   >
                                     취소
                                   </button>

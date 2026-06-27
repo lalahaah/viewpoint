@@ -1,18 +1,61 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { sponsorDashboardMock } from "@/lib/mockData"
+import { prisma } from "@/lib/prisma"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import Link from "next/link"
 
 export default async function SponsorDashboardPage() {
   const session = await auth()
 
-  if (!session || (session.user.role !== "SPONSOR" && session.user.role !== "ADMIN")) {
+  if (!session || !session.user || (session.user.role !== "SPONSOR" && session.user.role !== "ADMIN")) {
     redirect("/login")
   }
 
-  const { stats, recentBriefs } = sponsorDashboardMock
-  const isCreditLow = stats.creditBalance < 3
+  const userId = session.user.id
+  if (!userId) {
+    redirect("/login")
+  }
+
+  // 1) CreditBalance 조회 및 가입 보너스 크레딧 대응
+  let creditBalanceRecord = await prisma.creditBalance.findUnique({
+    where: { userId }
+  })
+  if (!creditBalanceRecord) {
+    creditBalanceRecord = await prisma.creditBalance.create({
+      data: { userId, balance: 3 }
+    })
+  }
+
+  // 2) 보낸 모든 브리프 조회 (통계 계산용)
+  const allBriefs = await prisma.brief.findMany({
+    where: { sponsorId: userId },
+    include: {
+      channel: {
+        select: { name: true }
+      }
+    },
+    orderBy: { createdAt: "desc" }
+  })
+
+  // 3) 통계 계산
+  const creditBalance = creditBalanceRecord.balance
+  const totalBriefs = allBriefs.length
+  const completedDeals = allBriefs.filter(b => b.status === "COMPLETED").length
+  const totalSpent = allBriefs
+    .filter(b => b.status === "COMPLETED")
+    .reduce((sum, b) => sum + b.budget, 0)
+
+  const stats = {
+    creditBalance,
+    totalBriefs,
+    completedDeals,
+    totalSpent
+  }
+
+  // 4) 최근 브리프 5개
+  const recentBriefs = allBriefs.slice(0, 5)
+
+  const isCreditLow = creditBalance < 3
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("ko-KR", {
@@ -48,7 +91,7 @@ export default async function SponsorDashboardPage() {
           </div>
           <Link
             href="/dashboard/sponsor/billing"
-            className="border border-black bg-black text-white hover:bg-white hover:text-black px-4 py-2 text-xs uppercase font-bold tracking-widest transition-colors w-full sm:w-auto text-center"
+            className="border border-black bg-black text-white hover:bg-white hover:text-black px-4 py-2 text-xs uppercase font-bold tracking-widest transition-colors w-full sm:w-auto text-center rounded-none"
           >
             충전하기
           </Link>
@@ -90,7 +133,7 @@ export default async function SponsorDashboardPage() {
                 <div key={brief.id} className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gray-50 transition-colors">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-lg">{brief.channelName}</p>
+                      <p className="font-bold text-lg">{brief.channel?.name || "알 수 없는 채널"}</p>
                       <span className="text-xs text-gray-400">({brief.brandName})</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
@@ -98,7 +141,7 @@ export default async function SponsorDashboardPage() {
                       <span className="hidden md:inline">|</span>
                       <span>제안 예산: <strong className="text-black">{formatCurrency(brief.budget)}</strong></span>
                       <span className="hidden md:inline">|</span>
-                      <span>발송일: {new Date(brief.sentAt).toLocaleDateString("ko-KR")}</span>
+                      <span>발송일: {new Date(brief.createdAt).toLocaleDateString("ko-KR")}</span>
                     </div>
                   </div>
                   <div>
