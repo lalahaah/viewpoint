@@ -55,7 +55,7 @@ export default async function SponsorDashboardPage() {
   // 4) 최근 브리프 5개
   const recentBriefs = allBriefs.slice(0, 5)
 
-  const isCreditLow = creditBalance < 3
+  const isCreditLow = creditBalance <= 0
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("ko-KR", {
