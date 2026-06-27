@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Channel } from "@/lib/mockData"
@@ -33,22 +34,34 @@ export default function ChannelCard({ channel, onClick }: ChannelCardProps) {
   const isUpcoming = channel.channelType === "UPCOMING"
   
   const progressPercent = isUpcoming 
-    ? Math.min(100, Math.round((channel.fundingCurrent / channel.fundingGoal) * 100))
+    ? Math.min(100, Math.round(((channel.fundingCurrent || 0) / (channel.fundingGoal || 1)) * 100))
     : 0
+
+  const thumbnailSrc = channel.portfolioImages?.[0]
+  const adPrices = (channel.adPrices || {}) as any
+  const integratedPrice = adPrices?.integrated?.price !== undefined ? adPrices.integrated.price : adPrices?.integrated
+  const shortsPrice = adPrices?.shorts?.price !== undefined ? adPrices.shorts.price : adPrices?.shorts
+  const earlyBirdPrice = adPrices?.earlyBird?.price !== undefined ? adPrices.earlyBird.price : adPrices?.earlyBird
 
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-black rounded-none cursor-pointer flex flex-col h-full hover:border-l-4 hover:border-l-blue-600 transition-all"
+      className="bg-white border border-black rounded-none cursor-pointer flex flex-col h-full hover:border-l-4 hover:border-l-blue-600 transition-all text-black"
     >
       {/* Thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden border-b border-black">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={channel.portfolioImages[0]}
-          alt={channel.name}
-          className="w-full h-full object-cover rounded-none"
-        />
+        {thumbnailSrc ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={thumbnailSrc}
+            alt={channel.name}
+            className="w-full h-full object-cover rounded-none"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold">
+            이미지 없음
+          </div>
+        )}
         {isUpcoming && (
           <div className="absolute top-3 right-3">
             <span className="bg-black text-white text-[10px] uppercase font-black px-2.5 py-1 rounded-full border border-black tracking-wider">
@@ -113,8 +126,8 @@ export default function ChannelCard({ channel, onClick }: ChannelCardProps) {
                 />
               </div>
               <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-500 font-bold">
-                <span>모금액 {channel.fundingCurrent.toLocaleString()}원</span>
-                <span className="text-blue-600 font-black">{getDDay(channel.earlyBirdDeadline)}</span>
+                <span>모금액 {(channel.fundingCurrent || 0).toLocaleString()}원</span>
+                <span className="text-blue-600 font-black">{channel.earlyBirdDeadline ? getDDay(channel.earlyBirdDeadline) : "–"}</span>
               </div>
             </div>
           )}
@@ -131,13 +144,13 @@ export default function ChannelCard({ channel, onClick }: ChannelCardProps) {
                 <div className="flex justify-between items-center">
                   <span className="uppercase text-[10px] tracking-wider text-gray-500">통합 광고</span>
                   <span className="font-black text-sm text-black">
-                    ₩{channel.adPrices.integrated.toLocaleString()}
+                    {integratedPrice ? `₩${Number(integratedPrice).toLocaleString()}` : "협의"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="uppercase text-[10px] tracking-wider text-gray-500">쇼츠 광고</span>
                   <span className="font-black text-sm text-black">
-                    ₩{channel.adPrices.shorts.toLocaleString()}
+                    {shortsPrice ? `₩${Number(shortsPrice).toLocaleString()}` : "협의"}
                   </span>
                 </div>
               </>
@@ -145,7 +158,7 @@ export default function ChannelCard({ channel, onClick }: ChannelCardProps) {
               <div className="flex justify-between items-center">
                 <span className="uppercase text-[10px] tracking-wider text-blue-600 font-black">얼리버드 단가</span>
                 <span className="font-black text-sm text-black">
-                  ₩{channel.adPrices.earlyBird.toLocaleString()}
+                  {earlyBirdPrice ? `₩${Number(earlyBirdPrice).toLocaleString()}` : "협의"}
                 </span>
               </div>
             )}

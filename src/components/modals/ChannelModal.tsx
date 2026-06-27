@@ -30,7 +30,7 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
 
   const isUpcoming = channel.channelType === "UPCOMING"
   const progressPercent = isUpcoming 
-    ? Math.min(100, Math.round((channel.fundingCurrent / channel.fundingGoal) * 100))
+    ? Math.min(100, Math.round(((channel.fundingCurrent || 0) / (channel.fundingGoal || 1)) * 100))
     : 0
 
   const adTypeKeys = [
@@ -63,7 +63,17 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
     }
   }
 
-  const topCountries = Object.entries(channel.audienceCountry || {})
+  // Json 필드 안전 파싱
+  const audienceCountry = (typeof channel.audienceCountry === "string" ? JSON.parse(channel.audienceCountry) : channel.audienceCountry) || {}
+  const audienceGender = (typeof channel.audienceGender === "string" ? JSON.parse(channel.audienceGender) : channel.audienceGender) || {}
+  const audienceDevice = (typeof channel.audienceDevice === "string" ? JSON.parse(channel.audienceDevice) : channel.audienceDevice) || {}
+  const audienceAge = (typeof channel.audienceAge === "string" ? JSON.parse(channel.audienceAge) : channel.audienceAge) || {}
+  const adPrices = (typeof channel.adPrices === "string" ? JSON.parse(channel.adPrices) : channel.adPrices) || {}
+  
+  const rawSponsorCases = typeof channel.sponsorCases === "string" ? JSON.parse(channel.sponsorCases) : channel.sponsorCases
+  const sponsorCases = Array.isArray(rawSponsorCases) ? rawSponsorCases : []
+
+  const topCountries = Object.entries(audienceCountry as Record<string, number>)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
 
@@ -225,11 +235,11 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
                     GENDER RATIO
                   </span>
                   <div className="flex justify-between items-center text-xs font-black">
-                    <span>남성 {channel.audienceGender?.male}%</span>
-                    <span>여성 {channel.audienceGender?.female}%</span>
+                    <span>남성 {audienceGender?.male || 0}%</span>
+                    <span>여성 {audienceGender?.female || 0}%</span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-none overflow-hidden flex border border-black">
-                    <div className="bg-black h-full" style={{ width: `${channel.audienceGender?.male || 50}%` }} />
+                    <div className="bg-black h-full" style={{ width: `${audienceGender?.male || 50}%` }} />
                   </div>
                 </div>
 
@@ -239,9 +249,9 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
                     DEVICES
                   </span>
                   <div className="flex justify-between text-[11px] font-black">
-                    <span>모바일 {channel.audienceDevice?.mobile}%</span>
-                    <span>PC {channel.audienceDevice?.desktop}%</span>
-                    <span>태블릿 {channel.audienceDevice?.tablet}%</span>
+                    <span>모바일 {audienceDevice?.mobile || 0}%</span>
+                    <span>PC {audienceDevice?.desktop || 0}%</span>
+                    <span>태블릿 {audienceDevice?.tablet || 0}%</span>
                   </div>
                 </div>
 
@@ -251,10 +261,10 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
                     AGE GROUPS
                   </span>
                   <div className="grid grid-cols-5 gap-2 text-center text-[10px] font-black">
-                    {Object.entries(channel.audienceAge || {}).map(([age, pct]) => (
+                    {Object.entries(audienceAge || {}).map(([age, pct]) => (
                       <div key={age} className="border border-black p-2 bg-gray-50">
                         <span className="block text-gray-500">{age}세</span>
-                        <span className="block text-sm font-black text-black mt-1">{pct}%</span>
+                        <span className="block text-sm font-black text-black mt-1">{String(pct)}%</span>
                       </div>
                     ))}
                   </div>
@@ -309,8 +319,8 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
                   </thead>
                   <tbody className="text-xs divide-y divide-black bg-white text-black font-bold">
                     {adTypeKeys.map(({ key, label }) => {
-                      const adDetail = (channel.adPrices as any)?.[key]
-                      const priceVal = adDetail?.price
+                      const adDetail = adPrices?.[key]
+                      const priceVal = adDetail?.price !== undefined ? adDetail.price : adDetail
                       const periodVal = adDetail?.period
                       const descVal = adDetail?.description || "-"
 
@@ -319,7 +329,7 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
                           <td className="p-3 uppercase tracking-wider">{label}</td>
                           <td className="p-3 text-black">
                             {priceVal !== null && priceVal !== undefined
-                              ? `₩${priceVal.toLocaleString()}`
+                              ? `₩${Number(priceVal).toLocaleString()}`
                               : "협의"}
                           </td>
                           <td className="p-3 text-gray-600">
@@ -341,10 +351,10 @@ export default function ChannelModal({ channel, onClose, onBriefClick }: Channel
               <span className="block text-[10px] uppercase tracking-widest text-gray-400 font-black mb-3">
                 PAST SPONSORS
               </span>
-              {channel.sponsorCases && channel.sponsorCases.length > 0 ? (
+              {sponsorCases && sponsorCases.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {channel.sponsorCases.map((sc: any, idx: number) => (
-                    <div key={idx} className="border border-black p-4 bg-gray-50 flex flex-col justify-between rounded-none">
+                  {sponsorCases.map((sc: any, idx: number) => (
+                    <div key={idx} className="border border-black p-4 bg-gray-50 flex flex-col justify-between rounded-none text-black">
                       <div>
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-black text-sm uppercase text-black">{sc.brandName}</span>

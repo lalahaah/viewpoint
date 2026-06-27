@@ -29,7 +29,7 @@ export default function ChannelGrid({ channels, onChannelClick }: ChannelGridPro
       searchLower === "" ||
       channel.name.toLowerCase().includes(searchLower) ||
       channel.category.toLowerCase().includes(searchLower) ||
-      channel.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+      (channel.tags || []).some((tag) => tag.toLowerCase().includes(searchLower))
 
     return matchesCategory && matchesType && matchesSearch
   })
