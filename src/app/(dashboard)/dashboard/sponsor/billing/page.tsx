@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { sponsorDashboardMock } from "@/lib/mockData"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 
@@ -14,9 +14,28 @@ export default function SponsorBillingPage() {
     }).format(amount)
   }
 
-  const handlePurchase = (packageName: string, price: number, credits: number) => {
-    console.log(`Purchase Request - Package: ${packageName}, Price: ${price}, Credits: ${credits}`)
-    alert(`${packageName} (${credits} 크레딧) 결제가 요청되었습니다. (Dodo Payments 연동은 Step 8에서 구현됩니다)`)
+  const [purchasing, setPurchasing] = useState<string | null>(null)
+
+  const handlePurchase = async (packageName: string) => {
+    setPurchasing(packageName)
+    try {
+      const res = await fetch("/api/payments/buy-credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ package: packageName }),
+      })
+      const result = await res.json()
+      if (!result.success) {
+        alert(`결제 요청 실패: ${result.error}`)
+        return
+      }
+      window.location.href = result.data.checkoutUrl
+    } catch (err) {
+      console.error("purchase error:", err)
+      alert("결제 요청 중 네트워크 오류가 발생했습니다.")
+    } finally {
+      setPurchasing(null)
+    }
   }
 
   const packages = [
@@ -103,14 +122,15 @@ export default function SponsorBillingPage() {
 
               <div className="pt-6">
                 <button
-                  onClick={() => handlePurchase(pkg.name, pkg.price, pkg.credits)}
+                  onClick={() => handlePurchase(pkg.name)}
+                  disabled={purchasing === pkg.name}
                   className={`w-full py-3 text-xs uppercase font-bold tracking-widest border border-black transition-colors ${
                     pkg.isBest
                       ? "bg-black text-white hover:bg-white hover:text-black"
                       : "bg-white text-black hover:bg-black hover:text-white"
-                  }`}
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  구매하기
+                  {purchasing === pkg.name ? "처리 중..." : "구매하기"}
                 </button>
               </div>
             </div>

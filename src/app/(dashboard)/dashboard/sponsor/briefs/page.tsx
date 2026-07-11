@@ -27,6 +27,7 @@ export default function SponsorBriefsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedBriefId, setExpandedBriefId] = useState<string | null>(null)
+  const [payingBriefId, setPayingBriefId] = useState<string | null>(null)
 
   const fetchBriefs = async () => {
     try {
@@ -51,6 +52,29 @@ export default function SponsorBriefsPage() {
 
   const handleRowClick = (id: string) => {
     setExpandedBriefId(expandedBriefId === id ? null : id)
+  }
+
+  const handlePayBrief = async (briefId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPayingBriefId(briefId)
+    try {
+      const res = await fetch("/api/payments/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ briefId }),
+      })
+      const result = await res.json()
+      if (!result.success) {
+        alert(`결제 요청 실패: ${result.error}`)
+        return
+      }
+      window.location.href = result.data.checkoutUrl
+    } catch (err) {
+      console.error("payment error:", err)
+      alert("결제 요청 중 네트워크 오류가 발생했습니다.")
+    } finally {
+      setPayingBriefId(null)
+    }
   }
 
   const formatCurrency = (amount: number) => {
@@ -118,13 +142,15 @@ export default function SponsorBriefsPage() {
         ) : (
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead className="bg-black text-white text-xs uppercase tracking-widest font-black border-b border-black">
-              <tr>
+              <tr
+                >
                 <th className="px-6 py-4">대상 채널</th>
                 <th className="px-6 py-4">브랜드명</th>
                 <th className="px-6 py-4">광고 유형</th>
                 <th className="px-6 py-4 text-right">제안 예산</th>
                 <th className="px-6 py-4 text-center">상태</th>
                 <th className="px-6 py-4">발송일</th>
+                <th className="px-6 py-4 text-center">결제</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black text-sm">
@@ -145,13 +171,24 @@ export default function SponsorBriefsPage() {
                         <StatusBadge status={brief.status} />
                       </td>
                       <td className="px-6 py-4 text-gray-500">{formatDate(brief.createdAt)}</td>
+                      <td className="px-6 py-4 text-center">
+                        {brief.status === "ACCEPTED" && (
+                          <button
+                            onClick={(e) => handlePayBrief(brief.id, e)}
+                            disabled={payingBriefId === brief.id}
+                            className="border border-black bg-black text-white px-3 py-1.5 text-[10px] uppercase font-black tracking-widest hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {payingBriefId === brief.id ? "처리중..." : "결제하기"}
+                          </button>
+                        )}
+                      </td>
                     </tr>
 
                     {/* Expanded Detail Row */}
                     <AnimatePresence initial={false}>
                       {isExpanded && (
                         <tr>
-                          <td colSpan={6} className="bg-gray-50 p-0 border-t border-black">
+                          <td colSpan={7} className="bg-gray-50 p-0 border-t border-black">
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}

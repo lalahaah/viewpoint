@@ -100,6 +100,15 @@ export default function CreatorChannelPage() {
 
   // Media kit PDF
   const [pdfFileName, setPdfFileName] = useState<string | null>(null)
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfUploading, setPdfUploading] = useState(false)
+  const [mediaKitUrl, setMediaKitUrl] = useState<string | null>(null)
+
+  // Thumbnail image (portfolioImages[0])
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [thumbnailUploading, setThumbnailUploading] = useState(false)
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null)
 
   // Sponsor Cases (dynamic)
   const [sponsorCases, setSponsorCases] = useState<SponsorCaseInput[]>([])
@@ -152,9 +161,67 @@ export default function CreatorChannelPage() {
     )
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setPdfFileName(e.target.files[0].name)
+      const file = e.target.files[0]
+      setPdfFile(file)
+      setPdfFileName(file.name)
+    }
+  }
+
+  const uploadPdf = async (): Promise<string | null> => {
+    if (!pdfFile) return null
+    setPdfUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", pdfFile)
+      fd.append("fileType", "mediakit")
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const json = await res.json()
+      if (json.success) {
+        setMediaKitUrl(json.data.url)
+        return json.data.url
+      } else {
+        alert("미디어킷 업로드 실패: " + json.error)
+        return null
+      }
+    } catch {
+      alert("미디어킷 업로드 중 네트워크 오류")
+      return null
+    } finally {
+      setPdfUploading(false)
+    }
+  }
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setThumbnailFile(file)
+      setThumbnailPreview(URL.createObjectURL(file))
+    }
+  }
+
+  const uploadThumbnail = async (): Promise<string | null> => {
+    if (!thumbnailFile) return thumbnailUrl
+    setThumbnailUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", thumbnailFile)
+      fd.append("fileType", "thumbnail")
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const json = await res.json()
+      if (json.success) {
+        setThumbnailUrl(json.data.url)
+        return json.data.url
+      } else {
+        alert("써네일 업로드 실패: " + json.error)
+        return null
+      }
+    } catch {
+      alert("써네일 업로드 중 네트워크 오류")
+      return null
+    } finally {
+      setThumbnailUploading(false)
     }
   }
 
@@ -200,11 +267,22 @@ export default function CreatorChannelPage() {
       package: { price: "", period: "", description: "" },
     })
     setPdfFileName(null)
+    setPdfFile(null)
+    setMediaKitUrl(null)
+    setThumbnailFile(null)
+    setThumbnailPreview(null)
+    setThumbnailUrl(null)
     setSponsorCases([])
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // 파일 업로드 먼저 처리
+    const [uploadedPdfUrl, uploadedThumbnailUrl] = await Promise.all([
+      uploadPdf(),
+      uploadThumbnail(),
+    ])
 
     const tags = tagsInput
       .split(",")
@@ -266,7 +344,8 @@ export default function CreatorChannelPage() {
         tablet: deviceTablet ? parseFloat(deviceTablet) : null,
       },
       adPrices: formattedAdPrices,
-      mediaKitUrl: pdfFileName,
+      mediaKitUrl: uploadedPdfUrl || mediaKitUrl || null,
+      portfolioImages: uploadedThumbnailUrl ? [uploadedThumbnailUrl] : [],
       sponsorCases,
     }
 
@@ -767,28 +846,72 @@ export default function CreatorChannelPage() {
                 </div>
               </div>
 
-              {/* Section 5: Media Kit */}
+              {/* Section 5: Media Kit & Thumbnail */}
               <div className="space-y-6 pt-10">
-                <h3 className="text-lg font-black uppercase tracking-wider">미디어킷</h3>
+                <h3 className="text-lg font-black uppercase tracking-wider">미디어킷 &amp; 대표 이미지</h3>
+
+                {/* PDF 업로드 */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider">PDF 파일 업로드</label>
+                  <label className="text-xs font-bold uppercase tracking-wider">미디어킷 PDF 업로드</label>
                   <div className="border border-black p-4 flex flex-col md:flex-row items-center gap-4 bg-gray-50">
                     <input
                       type="file"
                       accept=".pdf"
                       id="mediaKitUpload"
                       onChange={handleFileChange}
+                      disabled={pdfUploading}
                       className="hidden"
                     />
                     <label
                       htmlFor="mediaKitUpload"
-                      className="border border-black bg-white px-4 py-2 text-xs uppercase tracking-wider font-bold cursor-pointer hover:bg-black hover:text-white transition-colors"
+                      className={`border border-black bg-white px-4 py-2 text-xs uppercase tracking-wider font-bold cursor-pointer hover:bg-black hover:text-white transition-colors ${
+                        pdfUploading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     >
-                      파일 선택
+                      {pdfUploading ? "업로드 중..." : "파일 선택"}
                     </label>
                     <span className="text-sm text-gray-500">
                       {pdfFileName ? `선택된 파일: ${pdfFileName}` : "업로드된 파일 없음 (PDF 포맷만 지원)"}
                     </span>
+                  </div>
+                </div>
+
+                {/* 썸네일 이미지 업로드 (portfolioImages[0]) */}
+                <div className="flex flex-col space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider">대표 썸네일 이미지</label>
+                  <p className="text-xs text-gray-500">채널 카드에 표시되는 대표 이미지입니다. JPEG/PNG/WEBP/GIF 지원 (최대 5MB)</p>
+                  <div className="border border-black p-4 bg-gray-50 space-y-4">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="thumbnailUpload"
+                        onChange={handleThumbnailChange}
+                        disabled={thumbnailUploading}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="thumbnailUpload"
+                        className={`border border-black bg-white px-4 py-2 text-xs uppercase tracking-wider font-bold cursor-pointer hover:bg-black hover:text-white transition-colors ${
+                          thumbnailUploading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {thumbnailUploading ? "업로드 중..." : "이미지 선택"}
+                      </label>
+                      <span className="text-sm text-gray-500">
+                        {thumbnailFile ? `선택됨: ${thumbnailFile.name}` : "선택된 이미지 없음"}
+                      </span>
+                    </div>
+                    {thumbnailPreview && (
+                      <div className="border border-black overflow-hidden w-40 h-28">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={thumbnailPreview}
+                          alt="썸네일 미리보기"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
